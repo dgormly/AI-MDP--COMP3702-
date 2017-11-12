@@ -30,36 +30,58 @@ public class MySolver implements FundingAllocationAgent {
 	    // TODO Write your own code here.
 	}
 
+	/**
+	 * Called for a single ventures reward function
+	 * @param ventureNumber the venture number (indexed from 0)
+	 * @param initialFunding the initial funding before the action
+	 * @param addedFunding the added funding to the venture
+     * @return the reward function for the venture
+     */
 	private double rewardFunction(int ventureNumber, int initialFunding, int addedFunding){
 
 		//Note Venture Number is indexed from 0
 
 		double profit = 0;
 		double loss = 0;
+
+		//stored for efficiency
 		int currentAmount = initialFunding + addedFunding;
+
+		//we only care about the probs for our current amount of stock
 		List<Double> row = probabilities.get(ventureNumber).getRow(initialFunding+addedFunding);
 
-		/*
-		refactored code
-
+		//getting the expected value of each possible customer order
+		//note 0 is not included as it is a net 0 profit/loss
 		for (int i = 1; i < ventureManager.getMaxManufacturingFunds(); i++){
-			profit += Math.min(i, initialFunding + addedFunding) * row.get(i);
-		}
-		for  (int i = initialFunding + addedFunding; i < ventureManager.getMaxManufacturingFunds(); i++){
-			loss += (i-initialFunding-addedFunding) * row.get(i);
-		}
-
-		return 0.6*(spec.getSalePrices().get(ventureNumber)-addedFunding)*profit - 0.25*spec.getSalePrices().get(ventureNumber)*loss;
-		*/
-
-		for (int i = 1; i < ventureManager.getMaxManufacturingFunds(); i++){
+			// profit is based on the amount sold by the probability that it gets sold
+			// if we dont have enough stock we just sell all the current stock
 			profit += Math.min(i, currentAmount) * row.get(i);
 			if (i > currentAmount){
+				//we only lose money if we don't have enough product
 				loss += (i-currentAmount) * row.get(i);
 			}
 		}
 
 		return 0.6*(spec.getSalePrices().get(ventureNumber)-addedFunding)*profit - 0.25*spec.getSalePrices().get(ventureNumber)*loss;
+	}
+
+	/**
+	 * Gets the reward function from the current state and the action performed
+	 * @param states a list of the current states of each venture
+	 * @param actions a list of the current actions of each venture
+     * @return the total reward function R(s,a s')
+     */
+	private double rewardFunction(List<Integer> states, List<Integer> actions){
+
+		//Note ventures are indexed from 0
+		double totalReward = 0;
+
+		for (int i = 0; i < ventureManager.getNumVentures(); i++){
+			//reward is summed over all ventures
+			totalReward += rewardFunction(i, states.get(i), actions.get(i));
+		}
+
+		return totalReward;
 	}
 	
 	public List<Integer> generateAdditionalFundingAmounts(List<Integer> manufacturingFunds,
