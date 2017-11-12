@@ -13,7 +13,6 @@ import problem.VentureManager;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class MySolver implements FundingAllocationAgent {
 	
@@ -111,6 +110,26 @@ public class MySolver implements FundingAllocationAgent {
 
 		return additionalFunding;
 	}
+
+	/**
+	 * Gets the probability of transition from one state to the next
+	 * @param initialStates the initial states of each venture
+	 * @param actions the actions
+	 * @param futureStates the future states after customer buys
+	 */
+	private double transitionFunction(List<Integer> initialStates, List<Integer> actions, List<Integer> futureStates){
+
+		//start with 1 as the multiplicative identity
+		int probability = 1;
+
+		//multiples each probability
+		for (int i = 0; i < ventureManager.getNumVentures(); i++){
+			probability *= spec.getTransitions().get(i).get(initialStates.get(i) + actions.get(i), futureStates.get(i));
+		}
+
+		return probability;
+	}
+
 
 
 //	public void valueIteration(int numIterations, Map<State, Integer> stateMap, List<State> statesList, List<Action> actionList) {
