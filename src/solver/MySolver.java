@@ -13,6 +13,7 @@ import problem.VentureManager;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class MySolver implements FundingAllocationAgent {
 	
@@ -111,4 +112,21 @@ public class MySolver implements FundingAllocationAgent {
 		return additionalFunding;
 	}
 
+
+	public void valueIteration(int numIterations, Map<State, Integer> stateMap, List<State> statesList, List<Action> actionList) {
+		for (int i = 0; i < numIterations; i++) {
+			for (State state: statesList) {
+				int initialReward = 0;		// Insert correct reward function.
+				int bestTvalue = 0;
+
+				for (Action action : actionList) {
+					// int t = transitionFunciton(state, action);
+					// bestTvalue  =  t > bestTvalue ? t : bestTvalue;
+				}
+
+				stateMap.put(state, bestTvalue);
+
+			}
+		}
+	}
 }
