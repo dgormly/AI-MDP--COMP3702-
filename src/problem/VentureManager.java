@@ -1,5 +1,11 @@
 package problem;
 
+import solver.State;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * COMP3702 A3 2017 Support Code
  * v1.0
@@ -16,7 +22,9 @@ public class VentureManager {
 	private int maxManufacturingFunds;
 	/** Maximum amount of funding which can be added to a venture in 1 fortnight (x$10 000) */
     private int maxAdditionalFunding;
-	
+	/* Map containing all possible states and corresponding iteration value. */
+	private Map<State, Integer> stateMap;
+
 	/**
 	 * Constructor
 	 * @param name
@@ -28,6 +36,14 @@ public class VentureManager {
 		this.maxManufacturingFunds = maxManufacturingFunds;
 		this.maxAdditionalFunding = maxAdditionalFunding;
 		this.numVentures = numVentures;
+
+		// Load all states into map.
+		List<State> states = State.getAllStates(maxManufacturingFunds, numVentures);
+		stateMap = new HashMap<>();
+
+		for (State state : states) {
+			stateMap.put(state, 0);
+		}
 	}
 	
 	/**
@@ -55,6 +71,14 @@ public class VentureManager {
 		} else {
 			throw new IllegalArgumentException("Invalid customer level.");
 		}
+		// Load all states into map.
+		List<State> states = State.getAllStates(maxManufacturingFunds, numVentures);
+		stateMap = new HashMap<>();
+
+		for (State state : states) {
+			stateMap.put(state, 0);
+		}
+
 	}
 
 	public String getName() {

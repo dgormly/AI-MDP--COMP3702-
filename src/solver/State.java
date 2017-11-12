@@ -10,6 +10,9 @@ public class State {
         ventureStates = funding;
     }
 
+    public int getVenture(int ventureNum) {
+        return ventureStates[ventureNum];
+    }
 
     /**
      * Returns all possible states for a given number of ventures and max funding.
@@ -21,8 +24,10 @@ public class State {
      * @return
      *      List of permutations.
      */
-    public static List<State> getValidTransitionStates(int maxFunding, int numVentures) {
+    public static List<State> getAllStates(int maxFunding, int numVentures) {
         List<Integer[]> tempList = new ArrayList<>();
+
+        // Get base
         for (int i = 0; i <= maxFunding; i++) {
             Integer[] temp = new Integer[numVentures];
             Arrays.fill(temp, 0);
@@ -30,10 +35,12 @@ public class State {
             tempList.add(temp);
         }
 
+        // increment there-after
         for (int i = 1; i < numVentures; i++) {
             sum(tempList, i, maxFunding);
         }
 
+        // Convert to states.
         List<State> list = new ArrayList<>();
         for (Integer[] state : tempList) {
             State s = new State(state);
@@ -43,8 +50,18 @@ public class State {
         return list;
     }
 
+
+    /**
+     * Don't touch this!
+     * @param list
+     * @param ventureNum
+     * @param maxFunding
+     * @return
+     */
     private static List<Integer[]> sum(List<Integer[]> list, int ventureNum, int maxFunding) {
         List<Integer[]> finalList = new ArrayList<>();
+        // Get all values from given list, copy and increment the column.
+
         for (int i = 1; i <= maxFunding; i++) {
             for (Integer[] state : list) {
                 Integer[] s = state.clone();
@@ -52,6 +69,7 @@ public class State {
                 finalList.add(s);
             }
         }
+
         list.addAll(finalList);
         return list;
     }
