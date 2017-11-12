@@ -68,17 +68,17 @@ public class MySolver implements FundingAllocationAgent {
 	/**
 	 * Gets the reward function from the current state and the action performed
 	 * @param state a State object containing all venture states
-	 * @param actions a list of the current actions of each venture
+	 * @param action a list of the current actions of each venture
      * @return the total reward function R(s,a s')
      */
-	private double rewardFunction(State state, List<Integer> actions){
+	private double rewardFunction(State state, Action action){
 
 		//Note ventures are indexed from 0
 		double totalReward = 0;
 
 		for (int i = 0; i < ventureManager.getNumVentures(); i++){
 			//reward is summed over all ventures
-			totalReward += rewardFunction(i, state.getVenture(i), actions.get(i));
+			totalReward += rewardFunction(i, state.getVenture(i), action.getVenture(i));
 		}
 
 		return totalReward;

@@ -5,9 +5,18 @@ import java.util.*;
 public class State {
 
     private Integer[] ventureStates;
+    private int sum = 0;
 
     public State(Integer[] funding) {
         ventureStates = funding;
+
+        for (Integer i : funding) {
+            sum += i;
+        }
+    }
+
+    public int getFunding() {
+        return sum;
     }
 
     public int getVenture(int ventureNum) {
