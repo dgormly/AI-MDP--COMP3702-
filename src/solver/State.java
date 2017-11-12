@@ -21,13 +21,8 @@ public class State {
         Integer[] state = ventureStates;
 
         /* Get all combinations. */
-        for (int i = 0; i < ventureStates.length; i++) {
-            for (int y = 1; y < ventureStates[i]; y++) {
-                Integer[] tempState = state;
-                tempState[i] -= y;
-                allStates.add(tempState);
-            }
-        }
+
+        return allStates;
     }
 
 }
