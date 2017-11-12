@@ -36,16 +36,30 @@ public class MySolver implements FundingAllocationAgent {
 
 		double profit = 0;
 		double loss = 0;
+		int currentAmount = initialFunding + addedFunding;
+		List<Double> row = probabilities.get(ventureNumber).getRow(initialFunding+addedFunding);
+
+		/*
+		refactored code
+
 		for (int i = 1; i < ventureManager.getMaxManufacturingFunds(); i++){
-			profit += Math.min(i, initialFunding + addedFunding)* probabilities.get(ventureNumber).get(initialFunding + addedFunding, i);
+			profit += Math.min(i, initialFunding + addedFunding) * row.get(i);
 		}
 		for  (int i = initialFunding + addedFunding; i < ventureManager.getMaxManufacturingFunds(); i++){
-			loss += (i-initialFunding-addedFunding)*probabilities.get(ventureNumber).get(initialFunding+addedFunding, i);
+			loss += (i-initialFunding-addedFunding) * row.get(i);
 		}
 
 		return 0.6*(spec.getSalePrices().get(ventureNumber)-addedFunding)*profit - 0.25*spec.getSalePrices().get(ventureNumber)*loss;
+		*/
 
+		for (int i = 1; i < ventureManager.getMaxManufacturingFunds(); i++){
+			profit += Math.min(i, currentAmount) * row.get(i);
+			if (i > currentAmount){
+				loss += (i-currentAmount) * row.get(i);
+			}
+		}
 
+		return 0.6*(spec.getSalePrices().get(ventureNumber)-addedFunding)*profit - 0.25*spec.getSalePrices().get(ventureNumber)*loss;
 	}
 	
 	public List<Integer> generateAdditionalFundingAmounts(List<Integer> manufacturingFunds,
