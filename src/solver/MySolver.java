@@ -13,6 +13,7 @@ import problem.VentureManager;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class MySolver implements FundingAllocationAgent {
 	
@@ -27,7 +28,7 @@ public class MySolver implements FundingAllocationAgent {
 	}
 	
 	public void doOfflineComputation() {
-	    // TODO Write your own code here.
+		// TODO Replace this with your own code.
 	}
 
 	/**
@@ -113,39 +114,63 @@ public class MySolver implements FundingAllocationAgent {
 
 	/**
 	 * Gets the probability of transition from one state to the next
-	 * @param initialStates the initial states of each venture
-	 * @param actions the actions
-	 * @param futureStates the future states after customer buys
+	 * @param currentState, the initial states of each venture
+	 * @param action the actions
+	 * @param futureState the future states after customer buys
 	 */
-	private double transitionFunction(List<Integer> initialStates, List<Integer> actions, List<Integer> futureStates){
+	private double transitionFunction(State currentState, Action action, State futureState){
 
 		//start with 1 as the multiplicative identity
 		int probability = 1;
 
 		//multiples each probability
 		for (int i = 0; i < ventureManager.getNumVentures(); i++){
-			probability *= spec.getTransitions().get(i).get(initialStates.get(i) + actions.get(i), futureStates.get(i));
+			probability *= spec.getTransitions().get(i).get(currentState.getVenture(i) + action.getVenture(i), futureState.getVenture(i));
 		}
 
 		return probability;
 	}
 
 
+	/**
+	 * Iterates over all states for a set number of loops.
+	 * @param numIterations
+	 * 		Number of times to iterater over the state space.
+	 * @param stateMap
+	 * 		Maps state-space to iteration value.
+	 * @param statesList
+	 * 		State-space to iterate over
+	 * @param actionList
+	 * 		Action space.
+	 */
+	public void valueIteration(int numIterations, Map<State, Double> stateMap, List<State> statesList, List<Action> actionList) {
+		double discount = spec.getDiscountFactor();
 
-//	public void valueIteration(int numIterations, Map<State, Integer> stateMap, List<State> statesList, List<Action> actionList) {
-//		for (int i = 0; i < numIterations; i++) {
-//			for (State state: statesList) {
-//				int initialReward = 0;		// Insert correct reward function.
-//				int bestTvalue = 0;
-//
-//				for (Action action : actionList) {
-//					// int t = transitionFunciton(state, action);
-//					// bestTvalue  =  t > bestTvalue ? t : bestTvalue;
-//				}
-//
-//				stateMap.put(state, bestTvalue);
-//
-//			}
-//		}
-//	}
+		// Number of times to iterate.
+		for (int i = 0; i < numIterations; i++) {
+
+			// States to iterate over.
+			for (State currentState: statesList) {
+				double bestT = 0.0;
+
+				// List of actions to apply.
+				for (Action action : actionList) {
+					double initialReward = rewardFunction(currentState, action); // TODO does not check if action is valid for reward.
+					// Generate all possible future states from given action (There will be a more than one). This checks if action is valid.
+					List<State> nextStates = State.getNextState(currentState, action, ventureManager.getMaxManufacturingFunds());
+					double transition = 0;
+
+					// Calculate expected future utility.
+					for (State futureState : nextStates) {
+						transition += transitionFunction(currentState, action, futureState) * stateMap.get(futureState);
+					}
+					// Take the max utility found.
+					bestT  =  transition > bestT ? initialReward + discount * transition : bestT;
+				}
+				// Save utility value.
+				stateMap.put(currentState, bestT);
+
+			}
+		}
+	}
 }

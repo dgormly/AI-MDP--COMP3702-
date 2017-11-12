@@ -39,7 +39,7 @@ public class StateTest {
         assertEquals("Expected array of size 27", 27, validStates.size());
 
         validStates = state.getAllStates(6, 3);
-        assertEquals("Expected array of size 343", 343, validStates.size());
+        assertEquals("Expected array of size 343 (Gold)", 343, validStates.size());
     }
 
 

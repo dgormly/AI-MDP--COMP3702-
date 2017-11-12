@@ -118,7 +118,8 @@ public class State {
 
 
     /**
-     * Returns the next state given a current state, action, and maximum funding.
+     * Returns a list of all possible next states given a current state, action, and maximum funding.
+     *
      *
      * @param currentState
      *      Current state to find the next state of.
@@ -129,8 +130,10 @@ public class State {
      * @return
      *      Next State given the action. If the action is invalid the function will return null.
      */
-    public static State getNextState(State currentState, Action action, int maxFunding) {
+    public static List<State> getNextState(State currentState, Action action, int maxFunding) {
         Integer[] state = new Integer[currentState.ventureStates.length];
+        List<State> nextStates = new ArrayList<>();
+
         for (int i = 0; i < currentState.ventureStates.length; i++) {
             int c = currentState.getVenture(i);
             int a = action.getVenture(i);
@@ -140,8 +143,27 @@ public class State {
             } else {
                 return null;
             }
+
+            for (State s : getAllStates(maxFunding, currentState.ventureStates.length)) {
+                boolean valid = true;
+
+                for (int y = 0; y < currentState.ventureStates.length && valid == true; y++) {
+                    if (s.getFunding() > currentState.getFunding()) {
+                        valid = false;
+                    }
+
+                    if (s.getVenture(y) > currentState.getVenture(y) + action.getVenture(y)) {
+                        valid = false;
+                    }
+                }
+
+                if (valid) {
+                    nextStates.add(s);
+                }
+            }
+
         }
-        return new State(state);
+        return nextStates;
     }
 
 }
