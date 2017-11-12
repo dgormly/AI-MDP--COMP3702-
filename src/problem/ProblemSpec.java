@@ -27,6 +27,8 @@ public class ProblemSpec {
 	private VentureManager ventureManager;
 	/** The probabilities for the order demand for each venture */
 	private List<Matrix> probabilities;
+	/** The transition matrices for each venture */
+	private List<Matrix> transitions;
     /** The price received per sale for each venture type (x$10 000) */
     private List<Double> salePrices;
     /** Initial amount allocated to each venture's manufacturing fund */
@@ -125,6 +127,7 @@ public class ProblemSpec {
 				}
 				probabilities.add(new Matrix(data));
 			}
+			createTransitions();
 			modelLoaded = true;
 		} catch (InputMismatchException e) {
 			throw new IOException(String.format(
@@ -192,6 +195,48 @@ public class ProblemSpec {
 		return modelLoaded;
 	}
 
+	/**
+	 * Gets a single transition matrix for a venture
+	 * @param ventureNumber the venture to get the transition matrix of
+	 * @return the Transition matrix
+     */
+	private Matrix createTransition(int ventureNumber){
+		int size = ventureManager.getMaxManufacturingFunds()+1;
+		List<Double> row;
+		//initialises a transition matrix the correct size
+		double[][] data = new double[size][size];
+		for (int i = 0; i < size; i++){
+			row = probabilities.get(ventureNumber).getRow(i);
+			//when j = 0, we sum all the ones where j>i to its probability
+			data[i][0] = row.get(0);
+			for (int j = 1; j < size; j++){
+				if (j > i){
+					//the probability is 0 as they cannot by more than we have
+					data[i][j] = 0;
+					//and we add the probability to the chance we have 0
+					data[i][0] += row.get(j);
+				} else{
+
+					data[i][j] = row.get(j-i);
+				}
+			}
+		}
+
+		return new Matrix(data);
+	}
+
+	/**
+	 * Creates all the transition matrices
+	 */
+	private void createTransitions(){
+		//create new empty list
+		transitions = new ArrayList<>();
+		for (int i = 0; i < ventureManager.getNumVentures(); i++){
+			//add each transition tot the list
+			transitions.add(createTransition(i));
+		}
+	}
+
 	public int getNumFortnights() {
 		return numFortnights;
 	}
@@ -202,6 +247,10 @@ public class ProblemSpec {
 
 	public VentureManager getVentureManager() {
 		return ventureManager;
+	}
+
+	public List<Matrix> getTransitions(){
+		return new ArrayList<>(transitions);
 	}
 
 	public List<Matrix> getProbabilities() {

@@ -21,6 +21,10 @@ public class Matrix {
 			}
 		}
 	}
+
+	public Matrix(ArrayList<ArrayList<Double>> data){
+		this.data = new ArrayList<>(data);
+	}
 	
 	public double get(int row, int col) {
 		return data.get(row).get(col);
