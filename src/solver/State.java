@@ -1,6 +1,8 @@
 package solver;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class State {
 
@@ -21,6 +23,10 @@ public class State {
         for (Integer i : funding) {
             sum += i;
         }
+    }
+
+    public State(ArrayList<Integer> funding){
+        ventureStates = (Integer[]) funding.toArray();
     }
 
 
