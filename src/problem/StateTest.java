@@ -24,7 +24,7 @@ public class StateTest {
 
     @Test
     public void GetAllStatesTest() {
-        List<Integer[]> validStates = state.getValidTransitionStates(2, 2);
+        List<State> validStates = state.getValidTransitionStates(2, 2);
         assertEquals("Expected array of size 9", 9, validStates.size());
 
         validStates = state.getValidTransitionStates(2, 1);
