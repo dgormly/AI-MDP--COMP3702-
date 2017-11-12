@@ -6,13 +6,13 @@ package solver;
  * last updated by Nicholas Collins 19/10/17
  */
 
+import problem.Matrix;
+import problem.ProblemSpec;
+import problem.VentureManager;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import problem.VentureManager;
-import problem.Matrix;
-import problem.ProblemSpec;
 
 public class MySolver implements FundingAllocationAgent {
 	
@@ -28,6 +28,24 @@ public class MySolver implements FundingAllocationAgent {
 	
 	public void doOfflineComputation() {
 	    // TODO Write your own code here.
+	}
+
+	private double rewardFunction(int ventureNumber, int initialFunding, int addedFunding){
+
+		//Note Venture Number is indexed from 0
+
+		double profit = 0;
+		double loss = 0;
+		for (int i = 1; i < ventureManager.getMaxManufacturingFunds(); i++){
+			profit += Math.min(i, initialFunding + addedFunding)* probabilities.get(ventureNumber).get(initialFunding + addedFunding, i);
+		}
+		for  (int i = initialFunding + addedFunding; i < ventureManager.getMaxManufacturingFunds(); i++){
+			loss += (i-initialFunding-addedFunding)*probabilities.get(ventureNumber).get(initialFunding+addedFunding, i);
+		}
+
+		return 0.6*(spec.getSalePrices().get(ventureNumber)-addedFunding)*profit - 0.25*spec.getSalePrices().get(ventureNumber)*loss;
+
+
 	}
 	
 	public List<Integer> generateAdditionalFundingAmounts(List<Integer> manufacturingFunds,
