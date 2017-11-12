@@ -5,54 +5,55 @@ import java.util.*;
 public class State {
 
     private Integer[] ventureStates;
-    private List<Integer[]> allStateList = new ArrayList<>();
-
 
     public State(Integer[] funding) {
-
         ventureStates = funding;
-
     }
 
 
-    public Set<Integer[]> getValidTransitionStates(int maxFunding, int numVentures) {
-        Integer[] state = ventureStates;
-
+    /**
+     * Returns all possible states for a given number of ventures and max funding.
+     *
+     * @param maxFunding
+     *      The maximum value allowed for each venture.
+     * @param numVentures
+     *      Number of ventures.
+     * @return
+     *      List of permutations.
+     */
+    public static List<State> getValidTransitionStates(int maxFunding, int numVentures) {
         List<Integer[]> tempList = new ArrayList<>();
-
-        /* Get all combinations. */
-        for (int i = 0; i < numVentures; i++) {
-            for (int y = 1; y < maxFunding; y++) {
-                Integer[] temp = new Integer[numVentures];
-                Arrays.fill(temp, 0);
-                temp[i] = y;
-                tempList.add(temp);
-            }
+        for (int i = 0; i <= maxFunding; i++) {
+            Integer[] temp = new Integer[numVentures];
+            Arrays.fill(temp, 0);
+            temp[0] = i;
+            tempList.add(temp);
         }
 
-        allStateList.addAll(tempList);
-
-        int listSize = allStateList.size();
-        for (int v = 0; v < listSize; v++) {
-            Integer[] s1 = allStateList.get(v);
-            for (int i = 0; i < listSize; i++) {
-                Integer[] s2 = allStateList.get(i);
-                if (s1.equals(s2)) {
-                    continue;
-                }
-
-                for (int y = 0; y < numVentures; y++) {
-                    Integer[] t = s1.clone();
-                    t[y] = s2[y];
-                    if (!allStateList.contains(t)) {
-                        allStateList.add(t);
-                    }
-                }
-            }
+        for (int i = 1; i < numVentures; i++) {
+            sum(tempList, i, maxFunding);
         }
 
+        List<State> list = new ArrayList<>();
+        for (Integer[] state : tempList) {
+            State s = new State(state);
+            list.add(s);
+        }
 
-        return allStateList;
+        return list;
+    }
+
+    private static List<Integer[]> sum(List<Integer[]> list, int ventureNum, int maxFunding) {
+        List<Integer[]> finalList = new ArrayList<>();
+        for (int i = 1; i <= maxFunding; i++) {
+            for (Integer[] state : list) {
+                Integer[] s = state.clone();
+                s[ventureNum] = i;
+                finalList.add(s);
+            }
+        }
+        list.addAll(finalList);
+        return list;
     }
 
 }
