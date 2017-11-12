@@ -181,6 +181,17 @@ public class State implements Comparable {
     }
 
 
+    /**
+     * Checks if a given action is valid for the state.
+     *
+     * @param action
+     *      Action to check
+     * @param maxFunding
+     *      Upper-bound of manufacturing
+     * @return
+     *      True if action stays within the funding bounds.
+     *      False otherwise
+     */
     public boolean isValidAction(Action action, int maxFunding) {
         for (int i = 0; i < numVentures; i++) {
             if (ventureStates[i] + action.getVenture(i) > maxFunding) {
@@ -191,10 +202,32 @@ public class State implements Comparable {
     }
 
 
+    /**
+     * Returns all valid actions in decending order. Only needs to compute once.
+     *
+     * @param actionList
+     *      Complete action space go the
+     * @param maxFunding
+     *      Upper-bound of manufacturing
+     * @return
+     *      List of all valid actions for the given state
+     *      Null if the list hot been set (An empty list can represend that all ventures are maxxed out)
+     */
     public List<Action> getAllActions(List<Action> actionList, int maxFunding) {
-        if (validActions != null) {
-            return validActions;
+        if (validActions == null) {
+            return null;
         }
+        return validActions;
+    }
+
+
+    /**
+     * Generates a list of valid actions in decending order for the given state.
+     *
+     * @param actionList
+     * @param maxFunding
+     */
+    public List<Action> setValidActions(List<Action> actionList, int maxFunding) {
         validActions = new ArrayList<>();
         for (Action a : actionList) {
             if (isValidAction(a, maxFunding)) {
@@ -205,6 +238,16 @@ public class State implements Comparable {
     }
 
 
+    /**
+     * Compare two states against each other using total funding.
+     *
+     * @param o
+     *      object to compare against.
+     * @return
+     *      1 if greater than o
+     *      0 if equal to 0
+     *      -1 if less than o
+     */
     @Override
     public int compareTo(Object o) {
         if (o instanceof State) {

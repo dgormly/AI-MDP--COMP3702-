@@ -47,6 +47,7 @@ public class Action extends State {
 
     }
 
+
     /**
      * This function gets the next action to be checked by value iteration.
      * It calculates the most money that can be spent and generates actions which
