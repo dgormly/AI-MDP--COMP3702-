@@ -24,7 +24,7 @@ public class VentureManager {
 	/** Maximum amount of funding which can be added to a venture in 1 fortnight (x$10 000) */
     private int maxAdditionalFunding;
 	/* Map containing all possible states and corresponding iteration value. */
-	private Map<State, Integer> stateMap;
+	private Map<State, Double> stateMap;
 	/* Maps additional funding value to states when loading the statemap. */
 	private List<Action> actionList;
 
@@ -45,7 +45,7 @@ public class VentureManager {
 		stateMap = new HashMap<>();
 
 		for (State state : states) {
-			stateMap.put(state, 0);
+			stateMap.put(state, 0.0);
 		}
 
 		// Load all actions.
@@ -82,7 +82,7 @@ public class VentureManager {
 		List<State> states = State.getAllStates(maxManufacturingFunds, numVentures);
 		stateMap = new HashMap<>();
 		for (State state : states) {
-			stateMap.put(state, 0);
+			stateMap.put(state, 0.0);
 		}
 
 		// Load all actions

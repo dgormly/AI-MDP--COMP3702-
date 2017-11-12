@@ -16,7 +16,7 @@ public class ActionTest {
 
     @Test
     public void getActionSpaceTest() {
-        List<Action> actionList = Action.getAllActions(2, 1, 2);
-        assertEquals("Expected 3 actions.", 3, actionList.size());
+        List<Action> actionList = Action.getAllActions(5, 1, 2);
+        assertEquals("Expected 3 actions.", 6, actionList.size());
     }
 }
