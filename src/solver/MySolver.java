@@ -13,21 +13,73 @@ import problem.VentureManager;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 public class MySolver implements FundingAllocationAgent {
 	
 	private ProblemSpec spec = new ProblemSpec();
 	private VentureManager ventureManager;
     private List<Matrix> probabilities;
+    private double discountFactor;
 	
 	public MySolver(ProblemSpec spec) throws IOException {
 	    this.spec = spec;
 		ventureManager = spec.getVentureManager();
         probabilities = spec.getProbabilities();
+        discountFactor = spec.getDiscountFactor();
 	}
 	
 	public void doOfflineComputation() {
-	    // TODO Write your own code here.
+		boolean solved = false;
+
+		iterations = 0;
+		while(!solved) {
+			double maxUtilityChange = 0;
+
+			for(State state = mdp.getStartState(); state!=null; state=mdp.getNextState()) {
+
+				double utility = mdp.getUtility(state);
+				double reward = rewardFunction(state);
+
+				double maxCurrentUtility = -1e30;
+				Action maxAction = null;
+
+				// The following while loop computes \max_a\sum T(s,a,s')U(s')
+				for(Action action=mdp.getStartAction(); action!=null;
+					action=mdp.getNextAction()){
+
+					Vector transition = mdp.getTransition(state, action);
+					int size = transition.size();
+					double nextUtil = 0;
+					for(int i = 0; i < size; i++) {
+						Transition t=(Transition)transition.get(i);
+						double prob=t.probability;
+						State sPrime=t.nextState;
+						nextUtil += (prob * mdp.getUtility(sPrime));
+					}
+
+					if(nextUtil > maxCurrentUtility){
+						maxCurrentUtility = nextUtil;
+						maxAction = action;
+					}
+				}
+
+				maxCurrentUtility = reward + discountFactor * maxCurrentUtility;
+				mdp.setUtility(state, maxCurrentUtility);
+				mdp.setAction(state, maxAction);
+
+				double currentError = Math.abs(maxCurrentUtility - utility);
+				if(currentError > maxUtilityChange) {
+                    maxUtilityChange = currentError;
+                }
+			}
+
+			iterations++;
+			if(maxUtilityChange < epsilon * (1. - discountFactor)/discountFactor) {
+                solved = true;
+            }
+		}
+		return; //something
 	}
 
 	private double rewardFunction(int ventureNumber, int initialFunding, int addedFunding){
