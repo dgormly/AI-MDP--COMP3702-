@@ -2,13 +2,16 @@ package solver;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
-public class State {
+public class State implements Comparable {
 
     protected Integer[] ventureStates;
     private static List<State> allStates;
     private int sum = 0;
+    private static int numVentures;
+    private List<Action> validActions;
 
 
     /**
@@ -23,6 +26,7 @@ public class State {
         for (Integer i : funding) {
             sum += i;
         }
+        numVentures = funding.length;
     }
 
     public State(ArrayList<Integer> funding){
@@ -94,6 +98,8 @@ public class State {
         }
 
         allStates = list;
+
+        Collections.sort(allStates);
         return list;
     }
 
@@ -149,27 +155,68 @@ public class State {
             } else {
                 return null;
             }
+        }
+        State aState = new State(state);
+        nextStates.add(aState);
 
-            for (State s : getAllStates(maxFunding, currentState.ventureStates.length)) {
-                boolean valid = true;
+        for (State s : getAllStates(maxFunding, currentState.ventureStates.length)) {
+            boolean valid = true;
 
-                for (int y = 0; y < currentState.ventureStates.length && valid == true; y++) {
-                    if (s.getFunding() > currentState.getFunding()) {
-                        valid = false;
-                    }
-
-                    if (s.getVenture(y) > currentState.getVenture(y) + action.getVenture(y)) {
-                        valid = false;
-                    }
+            for (int y = 0; y < aState.ventureStates.length && valid == true; y++) {
+                if (s.getFunding() > aState.getFunding()) {
+                    valid = false;
                 }
 
-                if (valid) {
-                    nextStates.add(s);
+                if (s.getVenture(y) > aState.getVenture(y) + action.getVenture(y)) {
+                    valid = false;
                 }
             }
 
+            if (valid && !nextStates.contains(s)) {
+                nextStates.add(s);
+            }
         }
+
         return nextStates;
     }
 
+
+    public boolean isValidAction(Action action, int maxFunding) {
+        for (int i = 0; i < numVentures; i++) {
+            if (ventureStates[i] + action.getVenture(i) > maxFunding) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    public List<Action> getAllActions(List<Action> actionList, int maxFunding) {
+        if (validActions != null) {
+            return validActions;
+        }
+        validActions = new ArrayList<>();
+        for (Action a : actionList) {
+            if (isValidAction(a, maxFunding)) {
+                validActions.add(a);
+            }
+        }
+        return validActions;
+    }
+
+
+    @Override
+    public int compareTo(Object o) {
+        if (o instanceof State) {
+            State s = (State) o;
+            if (s.getFunding() > this.getFunding()) {
+                return 1;
+            } else if (s.getFunding() < this.getFunding()) {
+                return -1;
+            } else if (s.getFunding() == this.getFunding()) {
+                return 0;
+            }
+        }
+        return 1;
+    }
 }
