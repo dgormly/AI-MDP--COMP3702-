@@ -113,20 +113,20 @@ public class MySolver implements FundingAllocationAgent {
 	}
 
 
-	public void valueIteration(int numIterations, Map<State, Integer> stateMap, List<State> statesList, List<Action> actionList) {
-		for (int i = 0; i < numIterations; i++) {
-			for (State state: statesList) {
-				int initialReward = 0;		// Insert correct reward function.
-				int bestTvalue = 0;
-
-				for (Action action : actionList) {
-					// int t = transitionFunciton(state, action);
-					// bestTvalue  =  t > bestTvalue ? t : bestTvalue;
-				}
-
-				stateMap.put(state, bestTvalue);
-
-			}
-		}
-	}
+//	public void valueIteration(int numIterations, Map<State, Integer> stateMap, List<State> statesList, List<Action> actionList) {
+//		for (int i = 0; i < numIterations; i++) {
+//			for (State state: statesList) {
+//				int initialReward = 0;		// Insert correct reward function.
+//				int bestTvalue = 0;
+//
+//				for (Action action : actionList) {
+//					// int t = transitionFunciton(state, action);
+//					// bestTvalue  =  t > bestTvalue ? t : bestTvalue;
+//				}
+//
+//				stateMap.put(state, bestTvalue);
+//
+//			}
+//		}
+//	}
 }

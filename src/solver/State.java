@@ -4,9 +4,17 @@ import java.util.*;
 
 public class State {
 
-    private Integer[] ventureStates;
+    protected Integer[] ventureStates;
+    private static List<State> allStates;
     private int sum = 0;
 
+
+    /**
+     * Holds the state of all ventures.
+     *
+     * @param funding
+     *      Initial state.
+     */
     public State(Integer[] funding) {
         ventureStates = funding;
 
@@ -15,16 +23,34 @@ public class State {
         }
     }
 
+
+    /**
+     * The total amount of funding across all ventures.
+     *
+     * @return
+     *      The total sum.
+     */
     public int getFunding() {
         return sum;
     }
 
+
+    /**
+     * Returns the state of a given venture.
+     *
+     * @param ventureNum
+     *      Venture index to return starting from zero.
+     * @return
+     *      Venture state.
+     */
     public int getVenture(int ventureNum) {
         return ventureStates[ventureNum];
     }
 
     /**
-     * Returns all possible states for a given number of ventures and max funding.
+     * Returns all state permutations for a given number of ventures with a maximum funding.
+     *
+     * Runtime efficiency: O(n)
      *
      * @param maxFunding
      *      The maximum value allowed for each venture.
@@ -34,6 +60,11 @@ public class State {
      *      List of permutations.
      */
     public static List<State> getAllStates(int maxFunding, int numVentures) {
+
+        if (allStates != null) {
+            return allStates;
+        }
+
         List<Integer[]> tempList = new ArrayList<>();
 
         // Get base
@@ -56,12 +87,14 @@ public class State {
             list.add(s);
         }
 
+        allStates = list;
         return list;
     }
 
 
     /**
-     * Don't touch this!
+     * Don't touch this! Too hard to explain but is used to work out all permutations.
+     *
      * @param list
      * @param ventureNum
      * @param maxFunding
@@ -81,6 +114,34 @@ public class State {
 
         list.addAll(finalList);
         return list;
+    }
+
+
+    /**
+     * Returns the next state given a current state, action, and maximum funding.
+     *
+     * @param currentState
+     *      Current state to find the next state of.
+     * @param action
+     *      Action applied to the current state.
+     * @param maxFunding
+     *      The upperbound that each venture is allowed to have.
+     * @return
+     *      Next State given the action. If the action is invalid the function will return null.
+     */
+    public static State getNextState(State currentState, Action action, int maxFunding) {
+        Integer[] state = new Integer[currentState.ventureStates.length];
+        for (int i = 0; i < currentState.ventureStates.length; i++) {
+            int c = currentState.getVenture(i);
+            int a = action.getVenture(i);
+
+            if (c + a <= maxFunding) {
+                state[i] = c + a;
+            } else {
+                return null;
+            }
+        }
+        return new State(state);
     }
 
 }

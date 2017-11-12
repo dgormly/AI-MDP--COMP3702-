@@ -2,12 +2,8 @@ package solver;
 
 import org.junit.Before;
 import org.junit.Test;
-import solver.State;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
@@ -44,6 +40,24 @@ public class StateTest {
 
         validStates = state.getAllStates(6, 3);
         assertEquals("Expected array of size 343", 343, validStates.size());
+    }
+
+
+    @Test
+    public void NextStateTest() {
+        Integer[] s = {0, 0};
+        Integer[] a1 = {1, 1};
+        Integer[] a2 = {10, 10};
+
+        State state = new State(s);
+        Action action = new Action(a1);
+        Action action2 = new Action(a2);
+
+
+        assertEquals("Expected next state to be {1, 1}", 1, State.getNextState(state, action, 1).getVenture(0));
+        assertEquals("Expected next state to be {1, 1}", 1, State.getNextState(state, action, 1).getVenture(1));
+        assertEquals("Expected next state to be null", null, State.getNextState(state, action2, 1));
+
     }
 
 }

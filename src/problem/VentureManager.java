@@ -3,7 +3,6 @@ package problem;
 import solver.Action;
 import solver.State;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +47,9 @@ public class VentureManager {
 		for (State state : states) {
 			stateMap.put(state, 0);
 		}
+
+		// Load all actions.
+		actionList = Action.getAllActions(numVentures,maxAdditionalFunding, maxManufacturingFunds);
 	}
 	
 	/**
@@ -76,22 +78,18 @@ public class VentureManager {
 			throw new IllegalArgumentException("Invalid customer level.");
 		}
 
-		// Setup valid actions
-		actionList = new ArrayList<>();
-
 		// Load all states into map.
 		List<State> states = State.getAllStates(maxManufacturingFunds, numVentures);
 		stateMap = new HashMap<>();
-
 		for (State state : states) {
 			stateMap.put(state, 0);
-
-			if (state.getFunding() <= maxAdditionalFunding) {
-				actionList.add((Action) state);
-			}
 		}
 
+		// Load all actions
+		actionList = Action.getAllActions(numVentures,maxAdditionalFunding, maxManufacturingFunds);
+
 	}
+
 
 	public String getName() {
 		return name;
@@ -108,25 +106,5 @@ public class VentureManager {
 	public int getNumVentures() {
 		return numVentures;
 	}
-
-	public List<Action> getActions() {
-		return actionList;
-	}
-
-	public State getNextState(State currentState, State action) {
-		Integer[] state = new Integer[numVentures];
-		for (int i = 0; i < numVentures; i++) {
-			int c = currentState.getVenture(i);
-			int a = action.getVenture(i);
-
-			if (c + a >= maxManufacturingFunds) {
-				state[i] = c + a;
-			} else {
-				return null;
-			}
-		}
-		return new State(state);
-	}
-
 
 }
