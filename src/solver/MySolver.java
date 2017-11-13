@@ -38,7 +38,7 @@ public class MySolver implements FundingAllocationAgent {
 
         System.out.println("Policy:");
         stateSpace.forEach(e ->{
-            System.out.println(e + " -> " + e.getPolicy().toString());
+            System.out.println(e + " -> " + e.getPolicy().toString() + " " + e.getIterationValue());
         });
 	}
 
@@ -173,15 +173,15 @@ public class MySolver implements FundingAllocationAgent {
 					Action action = currentState.getAllActions(maxFunding).get(a);
 					double initialReward = rewardFunction(currentState, action);
 					// Generate all possible future states from given action (There will be a more than one). This checks if action is valid.
-					List<State> nextStates = State.getNextState(currentState, action, ventureManager.getMaxManufacturingFunds());
+					List<State> nextStates = currentState.getTransitionStates();
 					double transition = 0;
 
 					// Calculate expected future utility.
 					for (State futureState : nextStates) {
 						transition += transitionFunction(currentState, action, futureState) * futureState.getIterationValue();
+						// Take the max utility found.
+						bestT  =  initialReward + transition > bestT ? initialReward + discount * transition : bestT;
 					}
-					// Take the max utility found.
-					bestT  =  initialReward + transition > bestT ? initialReward + discount * transition : bestT;
 				}
 				// Save utility value.
 				currentState.setIterationValue(bestT);
