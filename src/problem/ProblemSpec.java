@@ -210,13 +210,13 @@ public class ProblemSpec {
 			//when j = 0, we sum all the ones where j>i to its probability
 			data[i][0] = row.get(0);
 			for (int j = 1; j < size; j++){
-				if (j > i){
+				if (j < i){
 					//the probability is 0 as they cannot by more than we have
 					data[i][j] = 0;
 					//and we add the probability to the chance we have 0
 					data[i][0] += row.get(j);
 				} else{
-					data[i][j] = row.get(j-i);
+					data[i][j] = row.get(j - i);
 				}
 			}
 		}

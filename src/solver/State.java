@@ -76,11 +76,8 @@ public class State implements Comparable {
      */
     public static List<State> getAllStates(int maxFunding, int numVentures) {
 
-        if (allStates != null) {
-            return allStates;
-        }
-
         List<Integer[]> tempList = new ArrayList<>();
+        List<State> allStates = new ArrayList<>();
 
         // Get base
         for (int i = 0; i <= maxFunding; i++) {
@@ -102,10 +99,13 @@ public class State implements Comparable {
             list.add(s);
         }
 
-        allStates = list;
-
-        Collections.sort(allStates);
-        return list;
+        Collections.sort(list);
+        for (State s : list) {
+            if (s.getFunding() <= maxFunding) {
+                allStates.add(s);
+            }
+        }
+        return allStates;
     }
 
 
@@ -218,7 +218,7 @@ public class State implements Comparable {
      */
     public List<Action> getAllActions(int maxAdditionalFunding) {
         if (validActions == null) {
-            return null;
+            return new ArrayList<>();
         }
 
         return validActions;
@@ -239,10 +239,7 @@ public class State implements Comparable {
         transitionStates = new ArrayList<>();
 
         // Get additional funding space available.
-        int fundingSpace = 0;
-        for (Integer i : ventureStates) {
-            fundingSpace = maxFunding - i;
-        }
+        int fundingSpace = maxFunding - getFunding();
 
         // Iterate backwards through list (ascending order)
         for (int i = actionList.size() -1; i >= 0; i--) {
@@ -298,10 +295,28 @@ public class State implements Comparable {
      *      List of states
      *      Null if the inventory is full.
      */
-    public List<State> getTransitionStates() {
-        return transitionStates;
+    public List<State> getTransitionStates(Action action) {
+        List<State> list = new ArrayList<>();
+        for (State s : transitionStates) {
+            boolean valid = true;
+            for (int i = 0; i < ventureStates.length; i++) {
+                if (ventureStates[i] + action.ventureStates[i] > s.ventureStates[i]) {
+                    valid = false;
+                    break;
+                }
+                if (valid) {
+                    list.add(s);
+                }
+            }
+        }
+
+        return list;
     }
 
+
+    public List<State> getAllTransitionStates() {
+        return transitionStates;
+    }
 
     /**
      * Returns a State object for the given integer array.
@@ -354,7 +369,7 @@ public class State implements Comparable {
      */
     public Action getPolicy() {
         State best = null;
-        for (State s : getTransitionStates()) {
+        for (State s : getAllTransitionStates()) {
             if (best == null) {
                 best = s;
             }
@@ -395,6 +410,6 @@ public class State implements Comparable {
 
     @Override
     public String toString() {
-        return Arrays.toString(ventureStates) + " -> " + getPolicy().toString();
+        return Arrays.toString(ventureStates);
     }
 }

@@ -13,30 +13,33 @@ import problem.VentureManager;
 import java.io.IOException;
 import java.util.*;
 
-import static java.util.stream.Collectors.toMap;
 
 public class MySolver implements FundingAllocationAgent {
 	
 	private ProblemSpec spec = new ProblemSpec();
 	private VentureManager ventureManager;
     private List<Matrix> probabilities;
-    private double discountFactor;
+    private Integer[] initialRewardAction = {0, 0};
 	
 	public MySolver(ProblemSpec spec) throws IOException {
 	    this.spec = spec;
 		ventureManager = spec.getVentureManager();
         probabilities = spec.getProbabilities();
-        discountFactor = spec.getDiscountFactor();
 	}
 	
 	public void doOfflineComputation() {
-		List<State> state = State.getAllStates(ventureManager.getMaxManufacturingFunds(), ventureManager.getNumVentures());
+		List<State> stateSpace = State.getAllStates(ventureManager.getMaxManufacturingFunds(), ventureManager.getNumVentures());
+		List<Action> actionSpace = Action.getAllActions(ventureManager.getNumVentures(), ventureManager.getMaxAdditionalFunding(), ventureManager.getMaxManufacturingFunds());
+		for (State s : stateSpace) {
+			s.setValidActions(actionSpace,ventureManager.getMaxManufacturingFunds());
+			//s.setIterationValue(rewardFunction(s, new Action(initialRewardAction)));
+		}
 
-		valueIteration(10, state);
+		valueIteration(2, stateSpace);
 
         System.out.println("Policy:");
-        state.forEach(e ->{
-            System.out.println(e);
+        stateSpace.forEach(e ->{
+            System.out.println(e + " -> " + e.getPolicy().toString() + " " + e.getIterationValue());
         });
 	}
 
@@ -47,7 +50,7 @@ public class MySolver implements FundingAllocationAgent {
 	 * @param addedFunding the added funding to the venture
      * @return the reward function for the venture
      */
-	private double rewardFunction(int ventureNumber, int initialFunding, int addedFunding){
+	protected double rewardFunction(int ventureNumber, int initialFunding, int addedFunding){
 
 		//Note Venture Number is indexed from 0
 
@@ -71,7 +74,7 @@ public class MySolver implements FundingAllocationAgent {
 				loss += (i-currentAmount) * row.get(i);
 			}
 		}
-
+// 0.6 * sales * P(sales) * profit - 0.25 * sales * P(misses)
 		return 0.6*(spec.getSalePrices().get(ventureNumber)-addedFunding)*profit - 0.25*spec.getSalePrices().get(ventureNumber)*loss;
 	}
 
@@ -81,7 +84,7 @@ public class MySolver implements FundingAllocationAgent {
 	 * @param action a list of the current actions of each venture
      * @return the total reward function R(s,a s')
      */
-	private double rewardFunction(State state, Action action){
+	protected double rewardFunction(State state, Action action){
 
 		//Note ventures are indexed from 0
 		double totalReward = 0;
@@ -99,7 +102,24 @@ public class MySolver implements FundingAllocationAgent {
 		// Example code that allocates an additional $10 000 to each venture.
 		// TODO Replace this with your own code.
 
-		List<Integer> additionalFunding = new ArrayList<Integer>();
+		List<Integer> additionalFunding = new ArrayList<>();
+		Action action = null;
+		List<State> states = State.getAllStates(ventureManager.getMaxManufacturingFunds(), ventureManager.getNumVentures());
+		for (int i = 0; i < states.size(); i++){
+			State state = new State(new ArrayList<>(manufacturingFunds));
+            if (states.get(i).equals(state)){
+                action = states.get(i).getPolicy();
+                break;
+            }
+		}
+        if (action == null){
+            throw new NullPointerException();
+        }
+        for (int i = 0; i < action.ventureStates.length; i++){
+            additionalFunding.add(action.ventureStates[i]);
+        }
+
+        return additionalFunding;
 
 
 		/*
@@ -124,7 +144,6 @@ public class MySolver implements FundingAllocationAgent {
 
 		return additionalFunding;
 		*/
-		return null;
 	}
 
 	/**
@@ -133,7 +152,7 @@ public class MySolver implements FundingAllocationAgent {
 	 * @param action the actions
 	 * @param futureState the future states after customer buys
 	 */
-	private double transitionFunction(State currentState, Action action, State futureState){
+	protected double transitionFunction(State currentState, Action action, State futureState){
 
 		//start with 1 as the multiplicative identity
 		int probability = 1;
@@ -156,6 +175,7 @@ public class MySolver implements FundingAllocationAgent {
 	 */
 	public void valueIteration(int numIterations, List<State> statesList) {
 		double discount = spec.getDiscountFactor();
+		int maxFunding = ventureManager.getMaxManufacturingFunds();
 
 		// Number of times to iterate TODO change this to check if converges).
 		for (int i = 0; i < numIterations; i++) {
@@ -166,18 +186,18 @@ public class MySolver implements FundingAllocationAgent {
 
 				// List of actions to apply.
 
-				for (Action action : currentState.getAllActions(ventureManager.getMaxAdditionalFunding())) {
+				for (int a = 0; a < currentState.getAllActions(maxFunding).size(); a++) {
+					Action action = currentState.getAllActions(maxFunding).get(a);
 					double initialReward = rewardFunction(currentState, action);
 					// Generate all possible future states from given action (There will be a more than one). This checks if action is valid.
-					List<State> nextStates = State.getNextState(currentState, action, ventureManager.getMaxManufacturingFunds());
+					List<State> nextStates = currentState.getTransitionStates(action);
 					double transition = 0;
-
 					// Calculate expected future utility.
 					for (State futureState : nextStates) {
 						transition += transitionFunction(currentState, action, futureState) * futureState.getIterationValue();
+						// Take the max utility found.
+						bestT  =  initialReward + discount * transition > bestT ? initialReward + discount * transition : bestT;
 					}
-					// Take the max utility found.
-					bestT  =  transition > bestT ? initialReward + discount * transition : bestT;
 				}
 				// Save utility value.
 				currentState.setIterationValue(bestT);
