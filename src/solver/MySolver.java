@@ -11,9 +11,9 @@ import problem.ProblemSpec;
 import problem.VentureManager;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static java.util.stream.Collectors.toMap;
 
 public class MySolver implements FundingAllocationAgent {
 	
@@ -28,7 +28,11 @@ public class MySolver implements FundingAllocationAgent {
 	}
 	
 	public void doOfflineComputation() {
-		// TODO Replace this with your own code.
+		Map<State, Double> map = new HashMap<>();
+		List<State> state = State.getAllStates(ventureManager.getMaxManufacturingFunds(), ventureManager.getNumVentures());
+		List<Action> actions = Action.getAllActions(ventureManager.getNumVentures(), ventureManager.getMaxAdditionalFunding(), ventureManager.getMaxManufacturingFunds());
+
+		LinkedHashMap<State, Double> orderedStates = valueIteration(100, map, state, actions);
 	}
 
 	/**
@@ -92,6 +96,10 @@ public class MySolver implements FundingAllocationAgent {
 
 		List<Integer> additionalFunding = new ArrayList<Integer>();
 
+
+		/*
+		List<Integer> additionalFunding = new ArrayList<Integer>();
+
 		int totalManufacturingFunds = 0;
 		for (int i : manufacturingFunds) {
 			totalManufacturingFunds += i;
@@ -110,6 +118,7 @@ public class MySolver implements FundingAllocationAgent {
 		}
 
 		return additionalFunding;
+		*/
 	}
 
 	/**
@@ -143,7 +152,7 @@ public class MySolver implements FundingAllocationAgent {
 	 * @param actionList
 	 * 		Action space.
 	 */
-	public void valueIteration(int numIterations, Map<State, Double> stateMap, List<State> statesList, List<Action> actionList) {
+	public LinkedHashMap<State, Double> valueIteration(int numIterations, Map<State, Double> stateMap, List<State> statesList, List<Action> actionList) {
 		double discount = spec.getDiscountFactor();
 
 		// Number of times to iterate TODO change this to check if converges).
@@ -154,7 +163,7 @@ public class MySolver implements FundingAllocationAgent {
 				double bestT = 0.0;
 
 				// List of actions to apply.
-				for (Action action : actionList) {
+				for (Action action : currentState.getAllActions(actionList, ventureManager.getMaxAdditionalFunding())) {
 					double initialReward = rewardFunction(currentState, action); // TODO does not check if action is valid for reward.
 					// Generate all possible future states from given action (There will be a more than one). This checks if action is valid.
 					List<State> nextStates = State.getNextState(currentState, action, ventureManager.getMaxManufacturingFunds());
@@ -172,5 +181,11 @@ public class MySolver implements FundingAllocationAgent {
 
 			}
 		}
+
+
+		return stateMap.entrySet().stream()
+				.sorted(Map.Entry.comparingByValue())
+				.collect(toMap(Map.Entry::getKey, Map.Entry::getValue,
+						(e1,e2) -> e1, LinkedHashMap::new));
 	}
 }
