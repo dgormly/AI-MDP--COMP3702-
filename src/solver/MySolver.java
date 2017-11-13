@@ -28,11 +28,15 @@ public class MySolver implements FundingAllocationAgent {
 	}
 	
 	public void doOfflineComputation() {
+<<<<<<< HEAD
 		Map<State, Double> map = new HashMap<>();
 		List<State> state = State.getAllStates(ventureManager.getMaxManufacturingFunds(), ventureManager.getNumVentures());
 		List<Action> actions = Action.getAllActions(ventureManager.getNumVentures(), ventureManager.getMaxAdditionalFunding(), ventureManager.getMaxManufacturingFunds());
 
 		LinkedHashMap<State, Double> orderedStates = valueIteration(100, map, state, actions);
+=======
+
+>>>>>>> e097b3b3a93eb78fb208b3439e05abeeb3fdaa4e
 	}
 
 	/**
@@ -163,6 +167,7 @@ public class MySolver implements FundingAllocationAgent {
 				double bestT = 0.0;
 
 				// List of actions to apply.
+
 				for (Action action : currentState.getAllActions(actionList, ventureManager.getMaxAdditionalFunding())) {
 					double initialReward = rewardFunction(currentState, action); // TODO does not check if action is valid for reward.
 					// Generate all possible future states from given action (There will be a more than one). This checks if action is valid.
@@ -188,4 +193,7 @@ public class MySolver implements FundingAllocationAgent {
 				.collect(toMap(Map.Entry::getKey, Map.Entry::getValue,
 						(e1,e2) -> e1, LinkedHashMap::new));
 	}
+
+
+
 }
