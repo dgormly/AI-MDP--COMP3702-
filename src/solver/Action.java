@@ -15,9 +15,9 @@ public class Action extends State {
         actionMap.put(Arrays.toString(funding), this);
     }
 
-    public Action(ArrayList<Integer> funding) {
-        super(funding);
-    }
+//    public Action(ArrayList<Integer> funding) {
+//        super(funding);
+//    }
 
     /**
      * Returns an Action object assiciated with the given array
@@ -83,71 +83,71 @@ public class Action extends State {
      * @param action the action we just checked
      * @return
      */
-    public static Action getNextAction(VentureManager vm, State state, Action action){
-        int base = vm.getMaxManufacturingFunds()+1;
-        //see getMaxFundingFor details
-        int maxFunds = getMaxFunding(vm, state);
-
-        //we haven't got an action yet lets make the first one with maxFunds used
-        if (action == null){
-            ArrayList<Integer> list = new ArrayList<>();
-            for (int i = 1; i < vm.getNumVentures(); i++){
-                list.add(0);
-            }
-            list.add(maxFunds);
-            return new Action(list); //needs to be the first good action
-        }
-        //convert the action to a number for arithmetic
-        int decimal = actionToDecimal(Arrays.asList(action.ventureStates), base);
-        while (decimal < Math.pow(base, vm.getNumVentures())* vm.getMaxManufacturingFunds()){
-            decimal += base-1;
-            if (sumDigitsBaseN(decimal, base) == maxFunds){
-                return decimalToAction(decimal, base);
-            }
-        }
-        //we're done with valid actions
-        return null;
-    }
-
-    /**
-     * Sums the digits corresponding to a decimal number
-     * @param number
-     * @param base
-     * @return
-     */
-    public static int sumDigitsBaseN(int number, int base){
-        int sum = 0;
-        int n = number;
-        while(n > 0){
-            sum += n%base;
-            n = n/base;
-        }
-        return sum;
-    }
-
-    /**
-     * Converts an action to a decimal
-     * @param action
-     * @param base
-     * @return
-     */
-    public static int actionToDecimal(List<Integer> action, int base){
-        int sum = 0;
-        for(int i = 0; i < action.size(); i++){
-            sum += Math.pow(base, action.size()-i)*action.get(i);
-        }
-        return sum;
-    }
-
-    public static Action decimalToAction(int number, int base){
-        ArrayList<Integer> list = new ArrayList<>();
-        int n = number;
-        while(n > 0){
-            list.add(0, n%base);
-            n = n/base;
-        }
-        return new Action(list);
-    }
+//    public static Action getNextAction(VentureManager vm, State state, Action action){
+//        int base = vm.getMaxManufacturingFunds()+1;
+//        //see getMaxFundingFor details
+//        int maxFunds = getMaxFunding(vm, state);
+//
+//        //we haven't got an action yet lets make the first one with maxFunds used
+//        if (action == null){
+//            ArrayList<Integer> list = new ArrayList<>();
+//            for (int i = 1; i < vm.getNumVentures(); i++){
+//                list.add(0);
+//            }
+//            list.add(maxFunds);
+//            return new Action(list); //needs to be the first good action
+//        }
+//        //convert the action to a number for arithmetic
+//        int decimal = actionToDecimal(Arrays.asList(action.ventureStates), base);
+//        while (decimal < Math.pow(base, vm.getNumVentures())* vm.getMaxManufacturingFunds()){
+//            decimal += base-1;
+//            if (sumDigitsBaseN(decimal, base) == maxFunds){
+//                return decimalToAction(decimal, base);
+//            }
+//        }
+//        //we're done with valid actions
+//        return null;
+//    }
+//
+//    /**
+//     * Sums the digits corresponding to a decimal number
+//     * @param number
+//     * @param base
+//     * @return
+//     */
+//    public static int sumDigitsBaseN(int number, int base){
+//        int sum = 0;
+//        int n = number;
+//        while(n > 0){
+//            sum += n%base;
+//            n = n/base;
+//        }
+//        return sum;
+//    }
+//
+//    /**
+//     * Converts an action to a decimal
+//     * @param action
+//     * @param base
+//     * @return
+//     */
+//    public static int actionToDecimal(List<Integer> action, int base){
+//        int sum = 0;
+//        for(int i = 0; i < action.size(); i++){
+//            sum += Math.pow(base, action.size()-i)*action.get(i);
+//        }
+//        return sum;
+//    }
+//
+//    public static Action decimalToAction(int number, int base){
+//        ArrayList<Integer> list = new ArrayList<>();
+//        int n = number;
+//        while(n > 0){
+//            list.add(0, n%base);
+//            n = n/base;
+//        }
+//        return new Action(list);
+//    }
 
     /**
      * The maximum funding that can be given is either the maxFunding given in

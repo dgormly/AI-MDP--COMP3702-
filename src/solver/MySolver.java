@@ -35,7 +35,7 @@ public class MySolver implements FundingAllocationAgent {
 			//s.setIterationValue(rewardFunction(s, new Action(initialRewardAction)));
 		}
 
-		valueIteration(2, stateSpace);
+		valueIteration(600, stateSpace);
 
         System.out.println("Policy:");
         stateSpace.forEach(e ->{
@@ -100,20 +100,25 @@ public class MySolver implements FundingAllocationAgent {
 	public List<Integer> generateAdditionalFundingAmounts(List<Integer> manufacturingFunds,
 														  int numFortnightsLeft) {
 		// Example code that allocates an additional $10 000 to each venture.
-		// TODO Replace this with your own code.
 
+		Integer[] manufacturingFundsArray = new Integer[manufacturingFunds.size()];
+		for (int i = 0; i < manufacturingFunds.size(); i++) {
+			manufacturingFundsArray[i] = manufacturingFunds.get(i);
+		}
 		List<Integer> additionalFunding = new ArrayList<>();
 		Action action = null;
 		List<State> states = State.getAllStates(ventureManager.getMaxManufacturingFunds(), ventureManager.getNumVentures());
 		for (int i = 0; i < states.size(); i++){
-			State state = new State(new ArrayList<>(manufacturingFunds));
+
+			State state = new State(manufacturingFundsArray);
             if (states.get(i).equals(state)){
                 action = states.get(i).getPolicy();
                 break;
             }
 		}
         if (action == null){
-            throw new NullPointerException();
+            Integer[] a =  {0, 0};
+            action = new Action(a);
         }
         for (int i = 0; i < action.ventureStates.length; i++){
             additionalFunding.add(action.ventureStates[i]);

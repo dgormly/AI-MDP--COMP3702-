@@ -34,9 +34,9 @@ public class State implements Comparable {
         stateMap.put(Arrays.toString(funding), this);
     }
 
-    public State(ArrayList<Integer> funding){
-        ventureStates = (Integer[]) funding.toArray();
-    }
+//    public State(ArrayList<Integer> funding){
+//        ventureStates = (Integer[]) funding.toArray();
+//    }
 
 
     /**
@@ -315,6 +315,9 @@ public class State implements Comparable {
 
 
     public List<State> getAllTransitionStates() {
+        if (transitionStates == null) {
+            return new ArrayList<>();
+        }
         return transitionStates;
     }
 
@@ -369,6 +372,7 @@ public class State implements Comparable {
      */
     public Action getPolicy() {
         State best = null;
+
         for (State s : getAllTransitionStates()) {
             if (best == null) {
                 best = s;
@@ -377,6 +381,10 @@ public class State implements Comparable {
             if (s.getIterationValue() > best.getIterationValue()) {
                 best = s;
             }
+        }
+
+        if (best == null) {
+            return null;
         }
 
         Integer[] state = best.ventureStates.clone();
