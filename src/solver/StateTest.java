@@ -16,32 +16,28 @@ public class StateTest {
     public void setupStates() {
         Integer[] input = {2, 2};
         state = new State(input);
-        State.getAllStates(3,2);
     }
 
 
     @Test
     public void GetAllStatesTest() {
-        List<State> validStates = state.getAllStates(2, 2);
-        assertEquals("Expected array of size 9", 9, validStates.size());
+        List<State> validStates = state.getAllStates(3, 2);
+        assertEquals("Expected array of size 10 (bronze)", 10, validStates.size());
 
-        validStates = state.getAllStates(2, 1);
-        assertEquals("Expected array of size 3", 3, validStates.size());
-
-        validStates = state.getAllStates(1, 1);
-        assertEquals("Expected array of size 2", 2, validStates.size());
-
-        validStates = state.getAllStates(1, 2);
-        assertEquals("Expected array of size 4", 4, validStates.size());
-
-        validStates = state.getAllStates(1, 3);
-        assertEquals("Expected array of size 8", 8, validStates.size());
-
-        validStates = state.getAllStates(2, 3);
-        assertEquals("Expected array of size 27", 27, validStates.size());
-
-        validStates = state.getAllStates(6, 3);
-        assertEquals("Expected array of size 343 (Gold)", 343, validStates.size());
+//        validStates = state.getAllStates(1, 1);
+//        assertEquals("Expected array of size 2", 2, validStates.size());
+//
+//        validStates = state.getAllStates(1, 2);
+//        assertEquals("Expected array of size 4", 4, validStates.size());
+//
+//        validStates = state.getAllStates(1, 3);
+//        assertEquals("Expected array of size 8", 8, validStates.size());
+//
+//        validStates = state.getAllStates(2, 3);
+//        assertEquals("Expected array of size 27", 27, validStates.size());
+//
+//        validStates = state.getAllStates(6, 3);
+//        assertEquals("Expected array of size 343 (Gold)", 343, validStates.size());
     }
 
 
@@ -65,11 +61,11 @@ public class StateTest {
 
     @Test
     public void getValidActionsTest() {
-        Integer[] input = {3,3};
+        Integer[] input = {2, 1};
         Integer[] output = {0, 0};
         state = new State(input);
         state.setValidActions(Action.getAllActions(2, 3, 3), 3);
-        assertEquals("Expected actions list to equal 1", 1, state.getAllActions(3).size());
+        assertEquals("Expected actions list to equal 0", 0, state.getAllActions(3).size());
         assertEquals("Expected action {0, 0}", Arrays.toString(output), Arrays.toString(state.getAllActions(3).get(0).ventureStates));
 
         Integer[] ss2 = {3, 2};

@@ -23,6 +23,7 @@ public class MySolverTest {
 //            2:0 v 1.08500 v' 1.47305 best action 0:1
 //            2:1 v 1.90000 v' 1.79031 best action 0:0
 //            3:0 v 1.54500 v' 1.93305 best action 0:0
+//
 //            0:0 v -0.73695 v' -0.35860 best action 3:0
 //            0:1 v -0.41969 v' -0.08987 best action 2:0
 //            0:2 v -0.37441 v' -0.41864 best action 1:0
@@ -45,7 +46,6 @@ public class MySolverTest {
         ventureManager = new VentureManager("bronze");
         solver = new MySolver(spec);
 
-
     }
 
     @Test
@@ -56,7 +56,7 @@ public class MySolverTest {
         Action action = new Action(a);
 
         double initialReward = solver.rewardFunction(state, action);
-        assertEquals("Expected", 0, initialReward, 0.0000);
+        assertEquals("Expected", 0.33, initialReward, 0.0000);
     }
 
     @Test
@@ -69,19 +69,20 @@ public class MySolverTest {
         List<State> stateSpace = State.getAllStates(ventureManager.getMaxManufacturingFunds(), ventureManager.getNumVentures());
         List<Action> actionSpace = Action.getAllActions(ventureManager.getNumVentures(), ventureManager.getMaxAdditionalFunding(), ventureManager.getMaxManufacturingFunds());
         for (State s : stateSpace) {
-            s.setValidActions(actionSpace,ventureManager.getMaxManufacturingFunds());
+            assertEquals("Max funding should equal 3", 3,ventureManager.getMaxManufacturingFunds());
+            s.setValidActions(actionSpace, 3);
             s.setIterationValue(solver.rewardFunction(s, new Action(initialRewardAction)));
         }
 
         double bestT = 0.0;
 
-        int actionNumber = state.getAllActions(3).size();
+        int actionNumber = state.setValidActions(actionSpace, 3).size();
         assertEquals("Expected only two valid actions.", 2, actionNumber);
 
         for (int a = 0; a < actionNumber; a++) {
             Action action = state.getAllActions(3).get(a);
 
-            if (a == 1) {
+            if (a == 0) {
                 assertEquals("Expected action {0, 0}", Arrays.toString(initialRewardAction), Arrays.toString(action.ventureStates));
             }
 

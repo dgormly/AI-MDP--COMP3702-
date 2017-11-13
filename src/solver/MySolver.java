@@ -32,10 +32,10 @@ public class MySolver implements FundingAllocationAgent {
 		List<Action> actionSpace = Action.getAllActions(ventureManager.getNumVentures(), ventureManager.getMaxAdditionalFunding(), ventureManager.getMaxManufacturingFunds());
 		for (State s : stateSpace) {
 			s.setValidActions(actionSpace,ventureManager.getMaxManufacturingFunds());
-			s.setIterationValue(rewardFunction(s, new Action(initialRewardAction)));
+			//s.setIterationValue(rewardFunction(s, new Action(initialRewardAction)));
 		}
 
-		valueIteration(1, stateSpace);
+		valueIteration(2, stateSpace);
 
         System.out.println("Policy:");
         stateSpace.forEach(e ->{
