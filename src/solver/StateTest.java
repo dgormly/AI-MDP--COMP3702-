@@ -65,15 +65,23 @@ public class StateTest {
         Integer[] output = {0, 0};
         state = new State(input);
         state.setValidActions(Action.getAllActions(2, 3, 3), 3);
-        assertEquals("Expected actions list to equal 0", 0, state.getAllActions(3).size());
+        assertEquals("Expected actions list to equal 0", 1, state.getAllActions(3).size());
         assertEquals("Expected action {0, 0}", Arrays.toString(output), Arrays.toString(state.getAllActions(3).get(0).ventureStates));
 
-        Integer[] ss2 = {3, 2};
-        Integer[] output2 = {0, 1};
+        Integer[] ss2 = {3, 0};
+        Integer[] output2 = {0, 0};
         State s2 = State.getState(ss2);
         s2.setValidActions(Action.getAllActions(2, 3, 3), 3);
-        assertEquals("Expected actions list to equal 2", 2, s2.getAllActions(3).size());
-        assertEquals("Expected action {0, 1}", Arrays.toString(output2), Arrays.toString(s2.getAllActions(3).get(1).ventureStates));
+        assertEquals("Expected actions list to equal 1", 1, s2.getAllActions(3).size());
+        assertEquals("Expected action {0, 1}", Arrays.toString(output2), Arrays.toString(s2.getAllActions(3).get(0).ventureStates));
+
+
+//        Integer[] ss3 = {3, 3};
+//        Integer[] output3 = {0, 1};
+//        State s3 = State.getState(ss3);
+//        s2.setValidActions(Action.getAllActions(2, 3, 3), 3);
+//        assertEquals("Expected actions list to equal 2", 1, s2.getAllActions(3).size());
+//        assertEquals("Expected action {0, 1}", Arrays.toString(output2), Arrays.toString(s2.getAllActions(3).get(1).ventureStates));
     }
 
 
