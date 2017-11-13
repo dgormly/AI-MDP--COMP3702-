@@ -45,7 +45,7 @@ public class StateTest {
 
     @Test
     public void NextStateTest() {
-        Integer[] s = {0, 0};
+        Integer[] s = {2, 2};
         Integer[] a1 = {1, 1};
         Integer[] a2 = {10, 10};
 
@@ -53,11 +53,11 @@ public class StateTest {
         Action action = new Action(a1);
         Action action2 = new Action(a2);
 
+        List<State> nextStates = State.getNextState(state, action, 5);
 
-        assertEquals("Expected next state to be {1, 1}", 1, State.getNextState(state, action, 1).getVenture(0));
-        assertEquals("Expected next state to be {1, 1}", 1, State.getNextState(state, action, 1).getVenture(1));
-        assertEquals("Expected next state to be null", null, State.getNextState(state, action2, 1));
+        assertEquals("Expected next state to be {1, 1}", 1, State.getNextState(state, action, 15).size());
+        assertEquals("Expected next state to be {1, 1}", 1, State.getNextState(state, action, 1).size());
+        //assertEquals("Expected next state to be null", null, State.getNextState(state, action2, 1).size());
 
     }
-
 }

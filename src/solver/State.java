@@ -224,12 +224,28 @@ public class State implements Comparable {
     /**
      * Generates a list of valid actions in decending order for the given state.
      *
+     * Will not check if funding space is less then action space.
+     *
      * @param actionList
      * @param maxFunding
      */
     public List<Action> setValidActions(List<Action> actionList, int maxFunding) {
         validActions = new ArrayList<>();
-        for (Action a : actionList) {
+
+        // Get additional funding space available.
+        int fundingSpace = 0;
+        for (Integer i : ventureStates) {
+            fundingSpace = maxFunding - i;
+        }
+
+        // Iterate backwards through list (ascending order)
+        for (int i = actionList.size() -1; i >= 0; i--) {
+            Action a = actionList.get(i);
+
+            if (a.getFunding() > fundingSpace) {
+                break;
+            }
+
             if (isValidAction(a, maxFunding)) {
                 validActions.add(a);
             }

@@ -44,12 +44,13 @@ public class VentureManager {
 		List<State> states = State.getAllStates(maxManufacturingFunds, numVentures);
 		stateMap = new HashMap<>();
 
+		// Load all actions into states.
+		actionList = Action.getAllActions(numVentures,maxAdditionalFunding, maxManufacturingFunds);
 		for (State state : states) {
 			stateMap.put(state, 0.0);
+			//state.setValidActions(actionList, maxManufacturingFunds);
 		}
 
-		// Load all actions.
-		actionList = Action.getAllActions(numVentures,maxAdditionalFunding, maxManufacturingFunds);
 	}
 	
 	/**

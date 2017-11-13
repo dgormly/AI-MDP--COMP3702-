@@ -146,7 +146,7 @@ public class MySolver implements FundingAllocationAgent {
 	public void valueIteration(int numIterations, Map<State, Double> stateMap, List<State> statesList, List<Action> actionList) {
 		double discount = spec.getDiscountFactor();
 
-		// Number of times to iterate.
+		// Number of times to iterate TODO change this to check if converges).
 		for (int i = 0; i < numIterations; i++) {
 
 			// States to iterate over.
