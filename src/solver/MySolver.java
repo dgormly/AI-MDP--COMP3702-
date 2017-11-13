@@ -28,7 +28,7 @@ public class MySolver implements FundingAllocationAgent {
 	}
 	
 	public void doOfflineComputation() {
-		// TODO Replace this with your own code.
+
 	}
 
 	/**
@@ -154,9 +154,8 @@ public class MySolver implements FundingAllocationAgent {
 				double bestT = 0.0;
 
 				// List of actions to apply.
-				for (Action action : actionList) {
-					double initialReward = rewardFunction(currentState, action); // TODO does not check if action is valid for reward.
-					// Generate all possible future states from given action (There will be a more than one). This checks if action is valid.
+				for (Action action : currentState.getAllActions(ventureManager.getMaxAdditionalFunding())) {
+					double initialReward = rewardFunction(currentState, action);
 					List<State> nextStates = State.getNextState(currentState, action, ventureManager.getMaxManufacturingFunds());
 					double transition = 0;
 
@@ -173,4 +172,7 @@ public class MySolver implements FundingAllocationAgent {
 			}
 		}
 	}
+
+
+
 }

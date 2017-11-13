@@ -213,10 +213,11 @@ public class State implements Comparable {
      *      List of all valid actions for the given state
      *      Null if the list hot been set (An empty list can represend that all ventures are maxxed out)
      */
-    public List<Action> getAllActions(List<Action> actionList, int maxFunding) {
+    public List<Action> getAllActions(int maxAdditionalFunding) {
         if (validActions == null) {
             return null;
         }
+
         return validActions;
     }
 
@@ -228,6 +229,7 @@ public class State implements Comparable {
      *
      * @param actionList
      * @param maxFunding
+     *
      */
     public List<Action> setValidActions(List<Action> actionList, int maxFunding) {
         validActions = new ArrayList<>();
@@ -277,5 +279,26 @@ public class State implements Comparable {
             }
         }
         return 1;
+    }
+
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        State state = (State) o;
+
+        if (sum != state.sum) return false;
+        // Probably incorrect - comparing Object[] arrays with Arrays.equals
+        return Arrays.equals(ventureStates, state.ventureStates);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Arrays.hashCode(ventureStates);
+        result = 31 * result + sum;
+        return result;
     }
 }
