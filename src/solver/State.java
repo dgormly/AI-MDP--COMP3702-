@@ -1,17 +1,21 @@
 package solver;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class State implements Comparable {
 
-    protected Integer[] ventureStates;
     private static List<State> allStates;
+    private static Map<String, State> stateMap = new HashMap<>();
+
+    protected Integer[] ventureStates;
     private int sum = 0;
     private static int numVentures;
     private List<Action> validActions;
+    private List<State> transitionStates;
+
+    private double iterationValue = 0.0;
+    private boolean convergered = false;
+
 
 
     /**
@@ -27,6 +31,7 @@ public class State implements Comparable {
             sum += i;
         }
         numVentures = funding.length;
+        stateMap.put(Arrays.toString(funding), this);
     }
 
     public State(ArrayList<Integer> funding){
@@ -156,7 +161,7 @@ public class State implements Comparable {
                 return null;
             }
         }
-        State aState = new State(state);
+        State aState = stateMap.get(Arrays.toString(state));
         nextStates.add(aState);
 
         for (State s : getAllStates(maxFunding, currentState.ventureStates.length)) {
@@ -205,9 +210,7 @@ public class State implements Comparable {
     /**
      * Returns all valid actions in decending order. Only needs to compute once.
      *
-     * @param actionList
-     *      Complete action space go the
-     * @param maxFunding
+     * @param maxAdditionalFunding
      *      Upper-bound of manufacturing
      * @return
      *      List of all valid actions for the given state
@@ -233,6 +236,7 @@ public class State implements Comparable {
      */
     public List<Action> setValidActions(List<Action> actionList, int maxFunding) {
         validActions = new ArrayList<>();
+        transitionStates = new ArrayList<>();
 
         // Get additional funding space available.
         int fundingSpace = 0;
@@ -250,6 +254,12 @@ public class State implements Comparable {
 
             if (isValidAction(a, maxFunding)) {
                 validActions.add(a);
+                Integer[] nextState = ventureStates.clone();
+                for (int s = 0; s < nextState.length; s++) {
+                    nextState[s] += a.getVenture(s);
+                }
+                State state = stateMap.get(Arrays.toString(nextState));
+                transitionStates.add(state);
             }
         }
         return validActions;
@@ -282,6 +292,85 @@ public class State implements Comparable {
     }
 
 
+    /**
+     * Returns a list of all possible states this function count transition to.
+     * @return
+     *      List of states
+     *      Null if the inventory is full.
+     */
+    public List<State> getTransitionStates() {
+        return transitionStates;
+    }
+
+
+    /**
+     * Returns a State object for the given integer array.
+     *
+     * This does not create a state.
+     *
+     * @param state
+     *      Object state to return
+     * @return
+     *      State associated with given array
+     *      Null if it does not exist.
+     */
+    public static State getState(Integer[] state) {
+        State s = stateMap.get(Arrays.toString(state));
+        return s;
+    }
+
+
+    /**
+     * Sets the iteration value and returns true if the value is converging.
+     * TODO Write check for convergence
+     *
+     * @param iterationValue
+     *      Value to update the iteration with.
+     * @return
+     *      True, the value has converged
+     *      False, the value has not converged
+     */
+    public boolean setIterationValue(double iterationValue) {
+        this.iterationValue = iterationValue;
+        return false;
+    }
+
+
+    /**
+     * returns the iteration value used in value iteration.
+     * @return
+     *      Decimal value
+     */
+    public double getIterationValue() {
+        return iterationValue;
+    }
+
+
+    /**
+     * Returns the best action to take for this state.
+     *
+     * @return
+     *      Action to take
+     */
+    public Action getPolicy() {
+        State best = null;
+        for (State s : getTransitionStates()) {
+            if (best == null) {
+                best = s;
+            }
+
+            if (s.getIterationValue() > best.getIterationValue()) {
+                best = s;
+            }
+        }
+
+        Integer[] state = best.ventureStates.clone();
+        for (int i = 0; i < ventureStates.length; i++) {
+            state[i] -= this.ventureStates[i];
+        }
+
+        return Action.getAction(state);
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -295,10 +384,17 @@ public class State implements Comparable {
         return Arrays.equals(ventureStates, state.ventureStates);
     }
 
+
     @Override
     public int hashCode() {
-        int result = Arrays.hashCode(ventureStates);
+        int result = Arrays.toString(ventureStates).hashCode();
         result = 31 * result + sum;
         return result;
+    }
+
+
+    @Override
+    public String toString() {
+        return Arrays.toString(ventureStates) + " -> " + getPolicy().toString();
     }
 }

@@ -30,11 +30,14 @@ public class MySolver implements FundingAllocationAgent {
 	}
 	
 	public void doOfflineComputation() {
-		Map<State, Double> map = new HashMap<>();
 		List<State> state = State.getAllStates(ventureManager.getMaxManufacturingFunds(), ventureManager.getNumVentures());
-		List<Action> actions = Action.getAllActions(ventureManager.getNumVentures(), ventureManager.getMaxAdditionalFunding(), ventureManager.getMaxManufacturingFunds());
 
-		LinkedHashMap<State, Double> orderedStates = valueIteration(100, map, state, actions);
+		valueIteration(10, state);
+
+        System.out.println("Policy:");
+        state.forEach(e ->{
+            System.out.println(e);
+        });
 	}
 
 	/**
@@ -148,14 +151,10 @@ public class MySolver implements FundingAllocationAgent {
 	 * Iterates over all states for a set number of loops.
 	 * @param numIterations
 	 * 		Number of times to iterater over the state space.
-	 * @param stateMap
-	 * 		Maps state-space to iteration value.
 	 * @param statesList
 	 * 		State-space to iterate over
-	 * @param actionList
-	 * 		Action space.
 	 */
-	public LinkedHashMap<State, Double> valueIteration(int numIterations, Map<State, Double> stateMap, List<State> statesList, List<Action> actionList) {
+	public void valueIteration(int numIterations, List<State> statesList) {
 		double discount = spec.getDiscountFactor();
 
 		// Number of times to iterate TODO change this to check if converges).
@@ -168,30 +167,26 @@ public class MySolver implements FundingAllocationAgent {
 				// List of actions to apply.
 
 				for (Action action : currentState.getAllActions(ventureManager.getMaxAdditionalFunding())) {
-					double initialReward = rewardFunction(currentState, action); // TODO does not check if action is valid for reward.
+					double initialReward = rewardFunction(currentState, action);
 					// Generate all possible future states from given action (There will be a more than one). This checks if action is valid.
 					List<State> nextStates = State.getNextState(currentState, action, ventureManager.getMaxManufacturingFunds());
 					double transition = 0;
 
 					// Calculate expected future utility.
 					for (State futureState : nextStates) {
-						transition += transitionFunction(currentState, action, futureState) * stateMap.get(futureState);
+						transition += transitionFunction(currentState, action, futureState) * futureState.getIterationValue();
 					}
 					// Take the max utility found.
 					bestT  =  transition > bestT ? initialReward + discount * transition : bestT;
 				}
 				// Save utility value.
-				stateMap.put(currentState, bestT);
-
+				currentState.setIterationValue(bestT);
 			}
 		}
-
-
-		return stateMap.entrySet().stream()
-				.sorted(Map.Entry.comparingByValue())
-				.collect(toMap(Map.Entry::getKey, Map.Entry::getValue,
-						(e1,e2) -> e1, LinkedHashMap::new));
 	}
+
+
+
 
 
 

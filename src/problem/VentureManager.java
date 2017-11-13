@@ -91,10 +91,6 @@ public class VentureManager {
 
 	}
 
-	public Map<State, Double> getStateMap() {
-		return stateMap;
-	}
-
 	public void setStateMap(Map<State, Double> stateMap) {
 		this.stateMap = stateMap;
 	}
