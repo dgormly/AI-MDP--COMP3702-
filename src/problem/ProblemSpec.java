@@ -216,7 +216,6 @@ public class ProblemSpec {
 					//and we add the probability to the chance we have 0
 					data[i][0] += row.get(j);
 				} else{
-
 					data[i][j] = row.get(j-i);
 				}
 			}
@@ -240,6 +239,8 @@ public class ProblemSpec {
 	public int getNumFortnights() {
 		return numFortnights;
 	}
+
+
 
 	public double getDiscountFactor() {
 		return discountFactor;

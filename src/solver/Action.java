@@ -2,20 +2,39 @@ package solver;
 
 import problem.VentureManager;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class Action extends State {
 
     private static List<Action> actionList;
+    private static Map<String, Action> actionMap = new HashMap<>();
+    private Integer[] state;
 
 
     public Action(Integer[] funding) {
         super(funding);
+        state = funding;
+        actionMap.put(Arrays.toString(funding), this);
     }
 
-    public Action(ArrayList<Integer> funding) { super(funding);}
+    public Action(ArrayList<Integer> funding) {
+        super(funding);
+    }
+
+    /**
+     * Returns an Action object assiciated with the given array
+     *
+     * This does not generate Action objects.
+     *
+     * @param action
+     *      action array to retrieve object for
+     * @return
+     *      Action object associated with given array
+     *      Null if the action is invalid.
+     */
+    public static Action getAction(Integer[] action) {
+        return actionMap.get(Arrays.toString(action));
+    }
 
     /**
      * Returns all actions. This function does not consider a specific state.
@@ -150,5 +169,14 @@ public class Action extends State {
             sum += state.ventureStates[i];
         }
         return Math.min(vm.getMaxAdditionalFunding(), vm.getMaxManufacturingFunds()*vm.getNumVentures()-sum);
+    }
+
+    /**
+     * TODO This can be used for filling in the output file once the iteration is working.
+     * @return
+     */
+    @Override
+    public String toString() {
+        return Arrays.toString(state);
     }
 }
