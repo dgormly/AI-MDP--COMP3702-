@@ -298,10 +298,28 @@ public class State implements Comparable {
      *      List of states
      *      Null if the inventory is full.
      */
-    public List<State> getTransitionStates() {
-        return transitionStates;
+    public List<State> getTransitionStates(Action action) {
+        List<State> list = new ArrayList<>();
+        for (State s : transitionStates) {
+            boolean valid = true;
+            for (int i = 0; i < ventureStates.length; i++) {
+                if (ventureStates[i] + action.ventureStates[i] > s.ventureStates[i]) {
+                    valid = false;
+                    break;
+                }
+                if (valid) {
+                    list.add(s);
+                }
+            }
+        }
+
+        return list;
     }
 
+
+    public List<State> getAllTransitionStates() {
+        return transitionStates;
+    }
 
     /**
      * Returns a State object for the given integer array.
@@ -354,7 +372,7 @@ public class State implements Comparable {
      */
     public Action getPolicy() {
         State best = null;
-        for (State s : getTransitionStates()) {
+        for (State s : getAllTransitionStates()) {
             if (best == null) {
                 best = s;
             }

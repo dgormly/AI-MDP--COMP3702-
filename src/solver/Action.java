@@ -8,12 +8,10 @@ public class Action extends State {
 
     private static List<Action> actionList;
     private static Map<String, Action> actionMap = new HashMap<>();
-    private Integer[] state;
 
 
     public Action(Integer[] funding) {
         super(funding);
-        state = funding;
         actionMap.put(Arrays.toString(funding), this);
     }
 
