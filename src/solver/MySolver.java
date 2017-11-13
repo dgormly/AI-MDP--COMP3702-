@@ -11,9 +11,9 @@ import problem.ProblemSpec;
 import problem.VentureManager;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
+
+import static java.util.stream.Collectors.toMap;
 
 public class MySolver implements FundingAllocationAgent {
 	
@@ -30,56 +30,11 @@ public class MySolver implements FundingAllocationAgent {
 	}
 	
 	public void doOfflineComputation() {
-		boolean solved = false;
+		Map<State, Double> map = new HashMap<>();
+		List<State> state = State.getAllStates(ventureManager.getMaxManufacturingFunds(), ventureManager.getNumVentures());
+		List<Action> actions = Action.getAllActions(ventureManager.getNumVentures(), ventureManager.getMaxAdditionalFunding(), ventureManager.getMaxManufacturingFunds());
 
-		iterations = 0;
-		while(!solved) {
-			double maxUtilityChange = 0;
-
-			for(State state = mdp.getStartState(); state!=null; state=mdp.getNextState()) {
-
-				double utility = mdp.getUtility(state);
-				double reward = rewardFunction(state);
-
-				double maxCurrentUtility = -1e30;
-				Action maxAction = null;
-
-				// The following while loop computes \max_a\sum T(s,a,s')U(s')
-				for(Action action=mdp.getStartAction(); action!=null;
-					action=mdp.getNextAction()){
-
-					Vector transition = mdp.getTransition(state, action);
-					int size = transition.size();
-					double nextUtil = 0;
-					for(int i = 0; i < size; i++) {
-						Transition t=(Transition)transition.get(i);
-						double prob=t.probability;
-						State sPrime=t.nextState;
-						nextUtil += (prob * mdp.getUtility(sPrime));
-					}
-
-					if(nextUtil > maxCurrentUtility){
-						maxCurrentUtility = nextUtil;
-						maxAction = action;
-					}
-				}
-
-				maxCurrentUtility = reward + discountFactor * maxCurrentUtility;
-				mdp.setUtility(state, maxCurrentUtility);
-				mdp.setAction(state, maxAction);
-
-				double currentError = Math.abs(maxCurrentUtility - utility);
-				if(currentError > maxUtilityChange) {
-                    maxUtilityChange = currentError;
-                }
-			}
-
-			iterations++;
-			if(maxUtilityChange < epsilon * (1. - discountFactor)/discountFactor) {
-                solved = true;
-            }
-		}
-		return; //something
+		LinkedHashMap<State, Double> orderedStates = valueIteration(100, map, state, actions);
 	}
 
 	/**
@@ -119,18 +74,18 @@ public class MySolver implements FundingAllocationAgent {
 
 	/**
 	 * Gets the reward function from the current state and the action performed
-	 * @param states a list of the current states of each venture
-	 * @param actions a list of the current actions of each venture
+	 * @param state a State object containing all venture states
+	 * @param action a list of the current actions of each venture
      * @return the total reward function R(s,a s')
      */
-	private double rewardFunction(List<Integer> states, List<Integer> actions){
+	private double rewardFunction(State state, Action action){
 
 		//Note ventures are indexed from 0
 		double totalReward = 0;
 
 		for (int i = 0; i < ventureManager.getNumVentures(); i++){
 			//reward is summed over all ventures
-			totalReward += rewardFunction(i, states.get(i), actions.get(i));
+			totalReward += rewardFunction(i, state.getVenture(i), action.getVenture(i));
 		}
 
 		return totalReward;
@@ -141,6 +96,10 @@ public class MySolver implements FundingAllocationAgent {
 		// Example code that allocates an additional $10 000 to each venture.
 		// TODO Replace this with your own code.
 
+		List<Integer> additionalFunding = new ArrayList<Integer>();
+
+
+		/*
 		List<Integer> additionalFunding = new ArrayList<Integer>();
 
 		int totalManufacturingFunds = 0;
@@ -161,6 +120,79 @@ public class MySolver implements FundingAllocationAgent {
 		}
 
 		return additionalFunding;
+		*/
+		return null;
 	}
+
+	/**
+	 * Gets the probability of transition from one state to the next
+	 * @param currentState, the initial states of each venture
+	 * @param action the actions
+	 * @param futureState the future states after customer buys
+	 */
+	private double transitionFunction(State currentState, Action action, State futureState){
+
+		//start with 1 as the multiplicative identity
+		int probability = 1;
+
+		//multiples each probability
+		for (int i = 0; i < ventureManager.getNumVentures(); i++){
+			probability *= spec.getTransitions().get(i).get(currentState.getVenture(i) + action.getVenture(i), futureState.getVenture(i));
+		}
+
+		return probability;
+	}
+
+
+	/**
+	 * Iterates over all states for a set number of loops.
+	 * @param numIterations
+	 * 		Number of times to iterater over the state space.
+	 * @param stateMap
+	 * 		Maps state-space to iteration value.
+	 * @param statesList
+	 * 		State-space to iterate over
+	 * @param actionList
+	 * 		Action space.
+	 */
+	public LinkedHashMap<State, Double> valueIteration(int numIterations, Map<State, Double> stateMap, List<State> statesList, List<Action> actionList) {
+		double discount = spec.getDiscountFactor();
+
+		// Number of times to iterate TODO change this to check if converges).
+		for (int i = 0; i < numIterations; i++) {
+
+			// States to iterate over.
+			for (State currentState: statesList) {
+				double bestT = 0.0;
+
+				// List of actions to apply.
+
+				for (Action action : currentState.getAllActions(ventureManager.getMaxAdditionalFunding())) {
+					double initialReward = rewardFunction(currentState, action); // TODO does not check if action is valid for reward.
+					// Generate all possible future states from given action (There will be a more than one). This checks if action is valid.
+					List<State> nextStates = State.getNextState(currentState, action, ventureManager.getMaxManufacturingFunds());
+					double transition = 0;
+
+					// Calculate expected future utility.
+					for (State futureState : nextStates) {
+						transition += transitionFunction(currentState, action, futureState) * stateMap.get(futureState);
+					}
+					// Take the max utility found.
+					bestT  =  transition > bestT ? initialReward + discount * transition : bestT;
+				}
+				// Save utility value.
+				stateMap.put(currentState, bestT);
+
+			}
+		}
+
+
+		return stateMap.entrySet().stream()
+				.sorted(Map.Entry.comparingByValue())
+				.collect(toMap(Map.Entry::getKey, Map.Entry::getValue,
+						(e1,e2) -> e1, LinkedHashMap::new));
+	}
+
+
 
 }
