@@ -28,13 +28,17 @@ public class MySolver implements FundingAllocationAgent {
 	}
 	
 	public void doOfflineComputation() {
-		List<State> state = State.getAllStates(ventureManager.getMaxManufacturingFunds(), ventureManager.getNumVentures());
+		List<State> stateSpace = State.getAllStates(ventureManager.getMaxManufacturingFunds(), ventureManager.getNumVentures());
+		List<Action> actionSpace = Action.getAllActions(ventureManager.getNumVentures(), ventureManager.getMaxAdditionalFunding(), ventureManager.getMaxManufacturingFunds());
+		for (State s : stateSpace) {
+			s.setValidActions(actionSpace,ventureManager.getMaxManufacturingFunds());
+		}
 
-		valueIteration(10, state);
+		valueIteration(10, stateSpace);
 
         System.out.println("Policy:");
-        state.forEach(e ->{
-            System.out.println(e);
+        stateSpace.forEach(e ->{
+            System.out.println(e + " -> " + e.getPolicy().toString());
         });
 	}
 
@@ -154,6 +158,7 @@ public class MySolver implements FundingAllocationAgent {
 	 */
 	public void valueIteration(int numIterations, List<State> statesList) {
 		double discount = spec.getDiscountFactor();
+		int maxFunding = ventureManager.getMaxManufacturingFunds();
 
 		// Number of times to iterate TODO change this to check if converges).
 		for (int i = 0; i < numIterations; i++) {
@@ -164,7 +169,8 @@ public class MySolver implements FundingAllocationAgent {
 
 				// List of actions to apply.
 
-				for (Action action : currentState.getAllActions(ventureManager.getMaxAdditionalFunding())) {
+				for (int a = 0; a < currentState.getAllActions(maxFunding).size(); a++) {
+					Action action = currentState.getAllActions(maxFunding).get(a);
 					double initialReward = rewardFunction(currentState, action);
 					// Generate all possible future states from given action (There will be a more than one). This checks if action is valid.
 					List<State> nextStates = State.getNextState(currentState, action, ventureManager.getMaxManufacturingFunds());
@@ -175,7 +181,7 @@ public class MySolver implements FundingAllocationAgent {
 						transition += transitionFunction(currentState, action, futureState) * futureState.getIterationValue();
 					}
 					// Take the max utility found.
-					bestT  =  transition > bestT ? initialReward + discount * transition : bestT;
+					bestT  =  initialReward + transition > bestT ? initialReward + discount * transition : bestT;
 				}
 				// Save utility value.
 				currentState.setIterationValue(bestT);

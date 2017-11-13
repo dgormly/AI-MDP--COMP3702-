@@ -218,7 +218,7 @@ public class State implements Comparable {
      */
     public List<Action> getAllActions(int maxAdditionalFunding) {
         if (validActions == null) {
-            return null;
+            return new ArrayList<>();
         }
 
         return validActions;
@@ -395,6 +395,6 @@ public class State implements Comparable {
 
     @Override
     public String toString() {
-        return Arrays.toString(ventureStates) + " -> " + getPolicy().toString();
+        return Arrays.toString(ventureStates);
     }
 }

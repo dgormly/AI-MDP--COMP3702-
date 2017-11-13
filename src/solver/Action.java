@@ -109,9 +109,6 @@ public class Action extends State {
         }
         //we're done with valid actions
         return null;
-
-
-
     }
 
     /**
@@ -175,8 +172,8 @@ public class Action extends State {
      * TODO This can be used for filling in the output file once the iteration is working.
      * @return
      */
-    @Override
-    public String toString() {
-        return Arrays.toString(state);
-    }
+//    @Override
+//    public String toString() {
+//        return Arrays.toString(state);
+//    }
 }
