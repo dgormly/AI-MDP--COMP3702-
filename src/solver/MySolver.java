@@ -35,11 +35,11 @@ public class MySolver implements FundingAllocationAgent {
 		}
 
 		valueIteration(stateSpace);
-
-        System.out.println("Policy:");
-        stateSpace.forEach(e ->{
-            System.out.println(e + " -> " + e.getPolicy().toString() + " " + e.getIterationValue());
-        });
+//
+//        System.out.println("Policy:");
+//        stateSpace.forEach(e ->{
+//            System.out.println(e + " -> " + e.getPolicy().toString() + " " + e.getIterationValue());
+//        });
 	}
 
 	/**
