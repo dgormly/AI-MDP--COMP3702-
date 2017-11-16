@@ -15,9 +15,6 @@ public class Action extends State {
         actionMap.put(Arrays.toString(funding), this);
     }
 
-//    public Action(ArrayList<Integer> funding) {
-//        super(funding);
-//    }
 
     /**
      * Returns an Action object assiciated with the given array
@@ -63,6 +60,29 @@ public class Action extends State {
         return actionList;
 
     }
+
+
+    /**
+     * The maximum funding that can be given is either the maxFunding given in
+     * the spec or if our funding levels are  high it is the total amount
+     * to reach maximum for each venture.
+     *
+     * @param vm
+     * @param state
+     * @return
+     */
+    public static int getMaxFunding(VentureManager vm, State state){
+        int sum = 0;
+        for (int i = 0; i < state.ventureStates.length; i++){
+            sum += state.ventureStates[i];
+        }
+        return Math.min(vm.getMaxAdditionalFunding(), vm.getMaxManufacturingFunds()*vm.getNumVentures()-sum);
+    }
+
+
+    //    public Action(ArrayList<Integer> funding) {
+//        super(funding);
+//    }
 
 
     /**
@@ -147,31 +167,5 @@ public class Action extends State {
 //            n = n/base;
 //        }
 //        return new Action(list);
-//    }
-
-    /**
-     * The maximum funding that can be given is either the maxFunding given in
-     * the spec or if our funding levels are  high it is the total amount
-     * to reach maximum for each venture.
-     *
-     * @param vm
-     * @param state
-     * @return
-     */
-    public static int getMaxFunding(VentureManager vm, State state){
-        int sum = 0;
-        for (int i = 0; i < state.ventureStates.length; i++){
-            sum += state.ventureStates[i];
-        }
-        return Math.min(vm.getMaxAdditionalFunding(), vm.getMaxManufacturingFunds()*vm.getNumVentures()-sum);
-    }
-
-    /**
-     * TODO This can be used for filling in the output file once the iteration is working.
-     * @return
-     */
-//    @Override
-//    public String toString() {
-//        return Arrays.toString(state);
 //    }
 }

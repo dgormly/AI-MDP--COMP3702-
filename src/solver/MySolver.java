@@ -32,15 +32,14 @@ public class MySolver implements FundingAllocationAgent {
 		List<Action> actionSpace = Action.getAllActions(ventureManager.getNumVentures(), ventureManager.getMaxAdditionalFunding(), ventureManager.getMaxManufacturingFunds());
 		for (State s : stateSpace) {
 			s.setValidActions(actionSpace,ventureManager.getMaxManufacturingFunds());
-			//s.setIterationValue(rewardFunction(s, new Action(initialRewardAction)));
 		}
 
-		valueIteration(600, stateSpace);
+		valueIteration(stateSpace);
 
-//        System.out.println("Policy:");
-//        stateSpace.forEach(e ->{
-//            System.out.println(e + " -> " + e.getPolicy().toString() + " " + e.getIterationValue());
-//        });
+        System.out.println("Policy:");
+        stateSpace.forEach(e ->{
+            System.out.println(e + " -> " + e.getPolicy().toString() + " " + e.getIterationValue());
+        });
 	}
 
 	/**
@@ -74,7 +73,6 @@ public class MySolver implements FundingAllocationAgent {
 				loss += (i-currentAmount) * row.get(i);
 			}
 		}
-// 0.6 * sales * P(sales) * profit - 0.25 * sales * P(misses)
 		return 0.6*(spec.getSalePrices().get(ventureNumber)-addedFunding)*profit - 0.25*spec.getSalePrices().get(ventureNumber)*loss;
 	}
 
@@ -148,6 +146,7 @@ public class MySolver implements FundingAllocationAgent {
 
 	/**
 	 * Gets the probability of transition from one state to the next
+	 *
 	 * @param currentState, the initial states of each venture
 	 * @param action the actions
 	 * @param futureState the future states after customer buys
@@ -168,26 +167,30 @@ public class MySolver implements FundingAllocationAgent {
 
 	/**
 	 * Iterates over all states for a set number of loops.
-	 * @param numIterations
-	 * 		Number of times to iterater over the state space.
+	 *
 	 * @param statesList
 	 * 		State-space to iterate over
 	 */
-	public void valueIteration(int numIterations, List<State> statesList) {
+	public void valueIteration(List<State> statesList) {
 		double discount = spec.getDiscountFactor();
 		int maxFunding = ventureManager.getMaxManufacturingFunds();
 
 		// Number of times to iterate TODO change this to check if converges).
-		for (int i = 0; i < numIterations; i++) {
 
+		int count = statesList.size();
+		while(count > 0) {
 			// States to iterate over.
 			for (State currentState: statesList) {
+				// Check for convergance
+				if (currentState.isConvergered()) {
+					count--;
+					continue;
+				}
+
 				double bestT = 0.0;
-
 				// List of actions to apply.
-
 				for (int a = 0; a < currentState.getAllActions(maxFunding).size(); a++) {
-					Action action = currentState.getAllActions(maxFunding).get(a);
+						Action action = currentState.getAllActions(maxFunding).get(a);
 					double initialReward = rewardFunction(currentState, action);
 					// Generate all possible future states from given action (There will be a more than one). This checks if action is valid.
 					List<State> nextStates = currentState.getTransitionStates(action);

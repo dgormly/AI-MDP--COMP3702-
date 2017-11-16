@@ -34,10 +34,6 @@ public class State implements Comparable {
         stateMap.put(Arrays.toString(funding), this);
     }
 
-//    public State(ArrayList<Integer> funding){
-//        ventureStates = (Integer[]) funding.toArray();
-//    }
-
 
     /**
      * The total amount of funding across all ventures.
@@ -314,6 +310,12 @@ public class State implements Comparable {
     }
 
 
+    /**
+     * Gets all states that the current state can transition into.
+     *
+     * @return
+     *
+     */
     public List<State> getAllTransitionStates() {
         if (transitionStates == null) {
             return new ArrayList<>();
@@ -340,7 +342,6 @@ public class State implements Comparable {
 
     /**
      * Sets the iteration value and returns true if the value is converging.
-     * TODO Write check for convergence
      *
      * @param iterationValue
      *      Value to update the iteration with.
@@ -349,10 +350,17 @@ public class State implements Comparable {
      *      False, the value has not converged
      */
     public boolean setIterationValue(double iterationValue) {
+        if (Math.abs(iterationValue - this.iterationValue) <= 1 * Math.pow(10, -5)) {
+            convergered = true;
+        }
         this.iterationValue = iterationValue;
         return false;
     }
 
+
+    public boolean isConvergered() {
+        return convergered;
+    }
 
     /**
      * returns the iteration value used in value iteration.
@@ -395,6 +403,16 @@ public class State implements Comparable {
         return Action.getAction(state);
     }
 
+
+    /**
+     * Compares if two states are equal by checking if the state array is the same.
+     *
+     * @param o
+     *      Object to compare.
+     * @return
+     *      True if the object is equivalent
+     *      False otherwise.
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -408,6 +426,12 @@ public class State implements Comparable {
     }
 
 
+    /**
+     * Converts the object to an unique number.
+     *
+     * @return
+     *      Unique prime number
+     */
     @Override
     public int hashCode() {
         int result = Arrays.toString(ventureStates).hashCode();
@@ -416,6 +440,12 @@ public class State implements Comparable {
     }
 
 
+    /**
+     * Converts the object to string.
+     *
+     * @return
+     *      String corresponding with the object
+     */
     @Override
     public String toString() {
         return Arrays.toString(ventureStates);
